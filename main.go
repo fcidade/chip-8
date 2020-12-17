@@ -1,8 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"os"
+	"log"
 )
 
 type Opcode uint16
@@ -46,37 +45,41 @@ func (vm *Machine) fetch() Opcode {
 	return hlt
 }
 
-func (vm *Machine) execute(opcode Opcode) {
+func (vm *Machine) execute(opcode Opcode) (keepRunning bool) {
 	switch opcode {
 	case hlt:
-		os.Exit(0)
+		log.Println("Exiting...")
+		return false
 
 	case lda:
 		vm.pc++
 		vm.a = uint16(vm.fetch())
-		fmt.Printf("Load to register A: %d (%#x)\n", vm.a, vm.a)
+		log.Printf("Load to register A: %d (%#x)\n", vm.a, vm.a)
 
 	case ldx:
 		vm.pc++
 		vm.x = uint16(vm.fetch())
-		fmt.Printf("Load to register X: %d (%#x)\n", vm.x, vm.x)
+		log.Printf("Load to register X: %d (%#x)\n", vm.x, vm.x)
 
 	case ldy:
 		vm.pc++
 		vm.y = uint16(vm.fetch())
-		fmt.Printf("Load to register Y: %d (%#x)\n", vm.y, vm.y)
+		log.Printf("Load to register Y: %d (%#x)\n", vm.y, vm.y)
 
 	case nop:
-		fmt.Println("Doing nothing.")
+		log.Println("Doing nothing.")
 	}
 
 	vm.pc++
+	return true
 }
 
 func (vm *Machine) run() {
 	vm.running = true
-	for vm.running {
-		vm.execute(vm.fetch())
+	for {
+		if !vm.execute(vm.fetch()) {
+			return
+		}
 	}
 }
 
@@ -88,12 +91,12 @@ func main() {
 		ldy, 0x11,
 	}
 
-	fmt.Println("Starting...")
+	log.Println("Starting...")
 
 	vm := NewMachine()
 
 	vm.loadProgram(program)
 	vm.run()
 
-	fmt.Println("End.")
+	log.Println("End.")
 }
