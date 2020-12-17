@@ -4,15 +4,16 @@ import (
 	"log"
 )
 
-type Opcode uint16
-
 const (
-	adc Opcode = iota
+	adc uint16 = iota
 	hlt
 	lda
 	ldx
 	ldy
-	nop 
+	nop
+	sta
+	stx
+	sty
 )
 
 type Machine struct {
@@ -22,7 +23,8 @@ type Machine struct {
 	pc uint16
 	sp int16
 	running bool
-	program []Opcode
+	program []uint16
+	ram []uint16
 }
 
 /*NewMachine -> Temp */
@@ -30,22 +32,31 @@ func NewMachine() Machine {
 	return Machine{
 		a: 0, x: 0, y: 0, pc :0, sp: -1,
 		running: false, 
-		program: []Opcode{},
+		program: []uint16{},
+		ram: make([]uint16, 0x000F),
 	}
 }
 
-func (vm *Machine) loadProgram(program []Opcode) {
+func (vm *Machine) read(addr uint16) uint16 {
+	return vm.ram[addr]
+}
+
+func (vm *Machine) write(addr uint16, value uint16) {
+	vm.ram[addr] = value
+}
+
+func (vm *Machine) loadProgram(program []uint16) {
 	vm.program = program
 }
 
-func (vm *Machine) fetch() Opcode {
+func (vm *Machine) fetch() uint16 {
 	if int(vm.pc) < len(vm.program) {
 		return vm.program[vm.pc]
 	}
 	return hlt
 }
 
-func (vm *Machine) execute(opcode Opcode) (keepRunning bool) {
+func (vm *Machine) execute(opcode uint16) (keepRunning bool) {
 	switch opcode {
 	case hlt:
 		log.Println("Exiting...")
@@ -68,6 +79,37 @@ func (vm *Machine) execute(opcode Opcode) (keepRunning bool) {
 
 	case nop:
 		log.Println("Doing nothing.")
+
+	case sta:
+		vm.pc++
+		var addr uint16 = uint16(vm.fetch())
+		vm.pc++
+		addr = (vm.fetch() << 8) | addr
+
+		vm.write(addr, vm.a)
+
+		log.Printf("Writing register A to ram : %d (%#x) on %d (%#x)\n", vm.a, vm.a, addr, addr)
+
+	case stx:
+		vm.pc++
+		var addr uint16 = uint16(vm.fetch())
+		vm.pc++
+		addr = (vm.fetch() << 8) | addr
+
+		vm.write(addr, vm.x)
+
+		log.Printf("Writing register X to ram : %d (%#x) on %d (%#x)\n", vm.x, vm.x, addr, addr)
+
+	case sty:
+		vm.pc++
+		var addr uint16 = uint16(vm.fetch())
+		vm.pc++
+		addr = (vm.fetch() << 8) | addr
+
+		vm.write(addr, vm.y)
+
+		log.Printf("Writing register Y to ram : %d (%#x) on %d (%#x)\n", vm.y, vm.y, addr, addr)
+
 	}
 
 	vm.pc++
@@ -84,11 +126,14 @@ func (vm *Machine) run() {
 }
 
 func main() {
-	program := []Opcode{
+	program := []uint16{
 		nop,
 		lda, 0x10,
 		ldx, 0x20,
 		ldy, 0x11,
+		sta, 0x01, 0x00,
+		stx, 0x02, 0x00,
+		sty, 0x03, 0x00,
 	}
 
 	log.Println("Starting...")
@@ -98,5 +143,7 @@ func main() {
 	vm.loadProgram(program)
 	vm.run()
 
+	log.Println("Ram:")
+	log.Println(vm.ram)
 	log.Println("End.")
 }
