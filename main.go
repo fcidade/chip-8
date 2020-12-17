@@ -56,11 +56,11 @@ func (vm *Machine) fetch() uint16 {
 	return hlt
 }
 
-func (vm *Machine) execute(opcode uint16) (keepRunning bool) {
+func (vm *Machine) execute(opcode uint16) {
 	switch opcode {
 	case hlt:
 		log.Println("Exiting...")
-		return false
+		vm.running = false
 
 	case lda:
 		vm.pc++
@@ -113,15 +113,12 @@ func (vm *Machine) execute(opcode uint16) (keepRunning bool) {
 	}
 
 	vm.pc++
-	return true
 }
 
 func (vm *Machine) run() {
 	vm.running = true
-	for {
-		if !vm.execute(vm.fetch()) {
-			return
-		}
+	for vm.running {
+		vm.execute(vm.fetch())
 	}
 }
 
