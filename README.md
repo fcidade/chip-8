@@ -1,6 +1,8 @@
+# ! This is a WORK IN PROGRESS!!! !
+
 # Chip-8 Emulator
 
-Memory: 4096 (from 0x000 to 0xFFF)
+Memory map: 4096 (from 0x000 to 0xFFF)
 chip8: 512 (0x000 to 0x1FF)
 programs: 
   Mostly start at 0x200 to 0xFFF
@@ -9,11 +11,15 @@ display refresh: 0xF00 -> 0xFFF
 call stack, internal use and other variables: 0xEA0-0xEFF
 
 Registers:
-V0 to VF
-VF can be a flag to some instructions, this, it should be avoided
-In ADD, VF is the carry flag
-in SUB, it's the "no borrow" flag
-and in the draw instruction VF is ser upon pixel collision
+  Chip-8 has 16 general porpuse 8-bit registers
+  V0 to VF
+  VF (alias "I") can be a flag to some instructions, this, it should be avoided
+  In ADD, VF is the carry flag
+  in SUB, it's the "no borrow" flag
+  and in the draw instruction VF is ser upon pixel collision
+  There's also two 8-bit registers for timers, when they're not 0, they're decremented in a 60hz rate.
+  PC -> Program Counter (16-bit) -> stores the current execuring address
+  SP -> Stack pointer (8-bit) -> points to the topmost level of the stack
 
 The stack
 Return addresses when subroutines are called
