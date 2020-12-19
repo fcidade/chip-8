@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 )
 
@@ -122,25 +123,73 @@ func (vm *Machine) run() {
 	}
 }
 
-func main() {
-	program := []uint16{
-		nop,
-		lda, 0x10,
-		ldx, 0x20,
-		ldy, 0x11,
-		sta, 0x01, 0x00,
-		stx, 0x02, 0x00,
-		sty, 0x03, 0x00,
+// ----------------------
+
+type AsciiGraphics struct {
+	width int
+	height int
+	screenData []bool
+	enabledChar string
+	disabledChar string
+
+}
+
+func NewAsciiGraphics(width int, height int, enabledChar string, disabledChar string) AsciiGraphics {
+	return AsciiGraphics{
+		width: width,
+		height: height,
+		screenData: make([]bool, width * height),
+		enabledChar: enabledChar,
+		disabledChar: disabledChar,
 	}
+}
 
-	log.Println("Starting...")
+func (g *AsciiGraphics) draw() {
+	for y := int(0); y < g.height; y++ {
+		for x := int(0); x < g.width; x++ {
+			isEnabled := g.screenData[(y * g.width) + x]
+			if isEnabled {
+				fmt.Print(g.enabledChar)
+			} else {
+				fmt.Print(g.disabledChar)
+			}
+		}
+		fmt.Println()
+	}
+}
 
-	vm := NewMachine()
+func (g *AsciiGraphics) putPixel(x, y int, active bool) {
+	g.screenData[(g.width * y) + x] = active
+}
 
-	vm.loadProgram(program)
-	vm.run()
+func main() {
 
-	log.Println("Ram:")
-	log.Println(vm.ram)
-	log.Println("End.")
+	g := NewAsciiGraphics(64, 32, "X", " ")
+
+	g.draw()
+	for i := 0; i < 10; i++ {
+		g.putPixel(i, i, true)
+	}
+	g.draw()
+
+	// program := []uint16{
+	// 	nop,
+	// 	lda, 0x10,
+	// 	ldx, 0x20,
+	// 	ldy, 0x11,
+	// 	sta, 0x01, 0x00,
+	// 	stx, 0x02, 0x00,
+	// 	sty, 0x03, 0x00,
+	// }
+
+	// log.Println("Starting...")
+
+	// vm := NewMachine()
+
+	// vm.loadProgram(program)
+	// vm.run()
+
+	// log.Println("Ram:")
+	// log.Println(vm.ram)
+	// log.Println("End.")
 }
