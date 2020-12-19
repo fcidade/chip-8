@@ -1,123 +1,81 @@
 package chip8
 
-import (
-	"log"
-)
+import "fmt"
 
-const (
-	adc int16 = iota
-	hlt
-	lda
-	ldx
-	ldy
-	nop
-	sta
-	stx
-	sty
-)
-
-type Machine struct {
-	a       int16
-	x       int16
-	y       int16
-	pc      int16
-	sp      int16
-	running bool
-	program []int16
-	ram     []int16
+type Chip8 struct {
+	memory  []uint
+	pc      uint
+	v       []uint
+	program []uint
+	i       *uint
 }
 
-/*NewMachine -> Temp */
-func NewMachine() Machine {
-	return Machine{
-		a: 0, x: 0, y: 0, pc: 0, sp: -1,
-		running: false,
-		program: []int16{},
-		ram:     make([]int16, 0x000F),
+func New() Chip8 {
+	c := Chip8{
+		memory: make([]uint, 0xFFF),
+		v:      make([]uint, 16),
+		pc:     0,
 	}
+	c.i = &c.v[0xF]
+	return c
 }
 
-func (vm *Machine) read(addr int16) int16 {
-	return vm.ram[addr]
+func (c *Chip8) LoadProgram(data []uint) {
+	c.program = data
 }
 
-func (vm *Machine) write(addr int16, value int16) {
-	vm.ram[addr] = value
+func (c Chip8) fetch() uint {
+	return c.program[c.pc]
 }
 
-func (vm *Machine) loadProgram(program []int16) {
-	vm.program = program
+func (c Chip8) decode(hex uint) uint {
+	return (hex & 0xFF00 >> 8) | (hex & 0x00FF << 8)
 }
 
-func (vm *Machine) fetch() int16 {
-	if int(vm.pc) < len(vm.program) {
-		return vm.program[vm.pc]
-	}
-	return hlt
-}
+func (c *Chip8) execute(code uint) {
 
-func (vm *Machine) execute(opcode int16) {
-	switch opcode {
-	case hlt:
-		log.Println("Exiting...")
-		vm.running = false
+	switch code & 0xF000 {
+	case 0x0000:
+		if code == 0x00E0 {
+			fmt.Println("Screen cleared!")
+		}
 
-	case lda:
-		vm.pc++
-		vm.a = int16(vm.fetch())
-		log.Printf("Load to register A: %d (%#x)\n", vm.a, vm.a)
+	case 0x6000:
+		register := c.getRegister(code)
+		value := c.getValue(code)
+		fmt.Printf("Set V%d to 0x%x!\n", register, value)
 
-	case ldx:
-		vm.pc++
-		vm.x = int16(vm.fetch())
-		log.Printf("Load to register X: %d (%#x)\n", vm.x, vm.x)
+	case 0xC000:
+		register := c.getRegister(code)
+		ran := 0
+		value := c.getValue(code)
+		fmt.Printf("Put in V%d generated random number '%d' and bitwise & w/ '%d' \n", register, ran, value)
 
-	case ldy:
-		vm.pc++
-		vm.y = int16(vm.fetch())
-		log.Printf("Load to register Y: %d (%#x)\n", vm.y, vm.y)
+	case 0xA000:
+		nnn := code & 0x0FFF
+		fmt.Printf("Set I to: 0x%x\n", nnn)
 
-	case nop:
-		log.Println("Doing nothing.")
+	case 0xF000:
+		// There are other cases, do in the future
+		fmt.Printf("I'm being honest: i didn't understand 0x%x\n", code)
 
-	case sta:
-		vm.pc++
-		var addr int16 = int16(vm.fetch())
-		vm.pc++
-		addr = (vm.fetch() << 8) | addr
-
-		vm.write(addr, vm.a)
-
-		log.Printf("Writing register A to ram : %d (%#x) on %d (%#x)\n", vm.a, vm.a, addr, addr)
-
-	case stx:
-		vm.pc++
-		var addr int16 = int16(vm.fetch())
-		vm.pc++
-		addr = (vm.fetch() << 8) | addr
-
-		vm.write(addr, vm.x)
-
-		log.Printf("Writing register X to ram : %d (%#x) on %d (%#x)\n", vm.x, vm.x, addr, addr)
-
-	case sty:
-		vm.pc++
-		var addr int16 = int16(vm.fetch())
-		vm.pc++
-		addr = (vm.fetch() << 8) | addr
-
-		vm.write(addr, vm.y)
-
-		log.Printf("Writing register Y to ram : %d (%#x) on %d (%#x)\n", vm.y, vm.y, addr, addr)
-
+	default:
+		fmt.Printf("No case for: 0x%x\n", code)
 	}
 
-	vm.pc++
+	c.pc++
 }
 
-func (vm *Machine) run() {
-	vm.running = true
-	for vm.running {
-		vm.execute(vm.fetch())
+func (c Chip8) getRegister(code uint) uint {
+	return code & 0x0F00 >> 8
+}
+
+func (c Chip8) getValue(code uint) uint {
+	return code & 0x00FF
+}
+
+func (c Chip8) Run() {
+	for range c.program {
+		c.execute(c.decode(c.fetch()))
 	}
 }

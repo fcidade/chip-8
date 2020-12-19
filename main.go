@@ -1,28 +1,26 @@
 package main
 
-import "github.com/franciscocid/vm/chip8"
-
-// ----------------------
+import (
+	"github.com/franciscocid/vm/chip8"
+)
 
 func main() {
 
-	g := chip8.NewAsciiGraphics(64, 32, "X", " ")
-
-	g.Draw()
-	for i := 0; i < 10; i++ {
-		g.PutPixel(i, i, true)
+	// g := chip8.NewAsciiGraphics(64, 32, "X", " ")
+	program := []uint{
+		0x0065,
+		0xe000,
+		0xffc3,
+		0x22a2,
+		0x33f3,
+		// 0x65f2,
+		// 0x0064,
+		// 0x29f0,
 	}
-	g.Draw()
 
-	// program := []int16{
-	// 	nop,
-	// 	lda, 0x10,
-	// 	ldx, 0x20,
-	// 	ldy, 0x11,
-	// 	sta, 0x01, 0x00,
-	// 	stx, 0x02, 0x00,
-	// 	sty, 0x03, 0x00,
-	// }
+	c8 := chip8.New()
+	c8.LoadProgram(program)
+	c8.Run()
 
 	// log.Println("Starting...")
 
