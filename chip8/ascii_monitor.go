@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-type AsciiGraphics struct {
+type AsciiMonitor struct {
 	width        int
 	height       int
 	screenData   []bool
@@ -12,8 +12,8 @@ type AsciiGraphics struct {
 	disabledChar string
 }
 
-func NewAsciiGraphics(width int, height int, enabledChar string, disabledChar string) AsciiGraphics {
-	return AsciiGraphics{
+func NewAsciiMonitor(width int, height int, enabledChar string, disabledChar string) AsciiMonitor {
+	return AsciiMonitor{
 		width:        width,
 		height:       height,
 		screenData:   make([]bool, width*height),
@@ -22,7 +22,7 @@ func NewAsciiGraphics(width int, height int, enabledChar string, disabledChar st
 	}
 }
 
-func (g *AsciiGraphics) Draw() {
+func (g *AsciiMonitor) Draw() {
 	for y := int(0); y < g.height; y++ {
 		for x := int(0); x < g.width; x++ {
 			isEnabled := g.screenData[(y*g.width)+x]
@@ -36,6 +36,6 @@ func (g *AsciiGraphics) Draw() {
 	}
 }
 
-func (g *AsciiGraphics) PutPixel(x, y int, active bool) {
+func (g *AsciiMonitor) PutPixel(x, y int, active bool) {
 	g.screenData[(g.width*y)+x] = active
 }
