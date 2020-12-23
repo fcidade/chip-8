@@ -5,14 +5,14 @@ import (
 )
 
 type AsciiMonitor struct {
-	width        int
-	height       int
+	width        uint
+	height       uint
 	screenData   []bool
 	enabledChar  string
 	disabledChar string
 }
 
-func NewAsciiMonitor(width int, height int, enabledChar string, disabledChar string) AsciiMonitor {
+func NewAsciiMonitor(width, height uint, enabledChar, disabledChar string) AsciiMonitor {
 	return AsciiMonitor{
 		width:        width,
 		height:       height,
@@ -22,9 +22,13 @@ func NewAsciiMonitor(width int, height int, enabledChar string, disabledChar str
 	}
 }
 
+func (g *AsciiMonitor) Clear() {
+	fmt.Print("\033[H\033[2J")
+}
+
 func (g *AsciiMonitor) Draw() {
-	for y := int(0); y < g.height; y++ {
-		for x := int(0); x < g.width; x++ {
+	for y := uint(0); y < g.height; y++ {
+		for x := uint(0); x < g.width; x++ {
 			isEnabled := g.screenData[(y*g.width)+x]
 			if isEnabled {
 				fmt.Print(g.enabledChar)
@@ -36,6 +40,6 @@ func (g *AsciiMonitor) Draw() {
 	}
 }
 
-func (g *AsciiMonitor) PutPixel(x, y int, active bool) {
-	g.screenData[(g.width*y)+x] = active
+func (g *AsciiMonitor) PutPixel(x, y uint) {
+	g.screenData[(g.width*y)+x] = true
 }
