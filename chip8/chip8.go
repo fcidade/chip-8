@@ -3,79 +3,52 @@ package chip8
 import "fmt"
 
 type Chip8 struct {
-	memory  []uint
-	pc      uint
-	v       []uint
-	program []uint
-	i       *uint
+	memory []uint8
+	pc     uint16
+	v      []uint8
+	i      uint16
+	dt		 uint8
+	st 		 uint8
 }
 
 func New() Chip8 {
-	c := Chip8{
-		memory: make([]uint, 0xFFF),
-		v:      make([]uint, 16),
-		pc:     0,
+	return Chip8{
+		memory: make([]uint8, 0xFFF),
+		v:      make([]uint8, 16),
+		pc:     0x200,
+		i: 0x0000,
 	}
-	c.i = &c.v[0xF]
-	return c
 }
 
-func (c *Chip8) LoadProgram(data []uint) {
-	c.program = data
+func (c8 *Chip8) LoadProgram(programData []uint8) {
+	for i, d := range programData {
+		c8.memory[0x200 + i] = d
+	}
 }
 
-func (c Chip8) fetch() uint {
-	return c.program[c.pc]
+func (c8 Chip8) fetch() uint {
+	// return c8.memory[c8.pc]
+	return 0
 }
 
-func (c Chip8) decode(hex uint) uint {
+func (c8 Chip8) decode(hex uint) uint {
 	return (hex & 0xFF00 >> 8) | (hex & 0x00FF << 8)
 }
 
-func (c *Chip8) execute(code uint) {
-
-	switch code & 0xF000 {
-	case 0x0000:
-		if code == 0x00E0 {
-			fmt.Println("Screen cleared!")
-		}
-
-	case 0x6000:
-		register := c.getRegister(code)
-		value := c.getValue(code)
-		fmt.Printf("Set V%d to 0x%x!\n", register, value)
-
-	case 0xC000:
-		register := c.getRegister(code)
-		ran := 0
-		value := c.getValue(code)
-		fmt.Printf("Put in V%d generated random number '%d' and bitwise & w/ '%d' \n", register, ran, value)
-
-	case 0xA000:
-		nnn := code & 0x0FFF
-		fmt.Printf("Set I to: 0x%x\n", nnn)
-
-	case 0xF000:
-		// There are other cases, do in the future
-		fmt.Printf("I'm being honest: i didn't understand 0x%x\n", code)
-
-	default:
-		fmt.Printf("No case for: 0x%x\n", code)
-	}
-
-	c.pc++
+func (c8 *Chip8) execute(code uint) {
+	fmt.Println("Placeholder! ;)")
 }
 
-func (c Chip8) getRegister(code uint) uint {
+func (c8 Chip8) getRegister(code uint) uint {
 	return code & 0x0F00 >> 8
 }
 
-func (c Chip8) getValue(code uint) uint {
+func (c8 Chip8) getValue(code uint) uint {
 	return code & 0x00FF
 }
 
-func (c Chip8) Run() {
-	for range c.program {
-		c.execute(c.decode(c.fetch()))
+func (c8 Chip8) Run() {
+	for i := 0x200; i < 0xFFF; i++ {
+		c8.execute(c8.decode(c8.fetch()))
 	}
 }
