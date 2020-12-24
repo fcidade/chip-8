@@ -20,7 +20,7 @@ func main() {
 		panic(err)
 	}
 
-	g := chip8.NewAsciiMonitor(64, 32, "X", " ")
+	g := chip8.NewAsciiMonitor(64, 32, "█", ".")
 	c8 := chip8.New(g)
 	c8.LoadProgram(program)
 	c8.Run()
