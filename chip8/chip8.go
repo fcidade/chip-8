@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"time"
 )
 
 type Chip8 struct {
@@ -95,6 +96,8 @@ func (c8 *Chip8) execute() {
 		log.Printf("SYS\t0x%03x", addr)
 
 	case 0x1000:
+		c8.pc = addr
+
 		log.Printf("JMP\t0x%03x", addr)
 
 	case 0x2000:
@@ -205,6 +208,7 @@ func (c8 *Chip8) execute() {
 			log.Printf("LD\tV%d, DT", x)
 
 		case 0x0A:
+
 			log.Printf("LD\tV%d, KEY", x)
 
 		case 0x15:
@@ -267,5 +271,6 @@ func (c8 Chip8) Run() {
 	c8.LoadFonts()
 	for c8.pc < 0xFFE {
 		c8.execute()
+		time.Sleep(time.Second / 60)
 	}
 }
