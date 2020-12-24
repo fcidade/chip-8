@@ -17,7 +17,7 @@ type Chip8 struct {
 	st     uint8
 }
 
-func New(g AsciiMonitor) Chip8 {
+func NewChip8(g Monitor) Chip8 {
 	return Chip8{
 		g:      g,
 		memory: make([]uint8, 0xFFF),
