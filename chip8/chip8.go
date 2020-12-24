@@ -1,31 +1,28 @@
 package chip8
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 )
 
 type Chip8 struct {
-	g 		 AsciiMonitor
+	g      AsciiMonitor
 	memory []uint8
 	pc     uint16
 	v      []uint8
 	i      uint16
-	dt		 uint8
-	st 		 uint8
+	dt     uint8
+	st     uint8
 }
 
 func New(g AsciiMonitor) Chip8 {
-	c8 := Chip8{
-		g: g,
+	return Chip8{
+		g:      g,
 		memory: make([]uint8, 0xFFF),
 		v:      make([]uint8, 16),
 		pc:     0x200,
-		i: 			0x0000,
+		i:      0x0000,
 	}
-	c8.LoadFonts()
-	return c8
 }
 
 func (c8 *Chip8) Read(addr uint16) uint8 {
@@ -57,18 +54,17 @@ func (c8 *Chip8) LoadFonts() {
 	}
 	for addr, value := range fonts {
 		c8.Write(uint16(addr), value)
-		fmt.Println(uint16(addr), value)
 	}
 }
 
 func (c8 *Chip8) LoadProgram(programData []uint8) {
 	for i, d := range programData {
-		c8.Write(uint16(0x200 + i), d)
+		c8.Write(uint16(0x200+i), d)
 	}
 }
 
 func (c8 *Chip8) fetch() uint16 {
-	most_significant:= c8.Read(c8.pc)
+	most_significant := c8.Read(c8.pc)
 	c8.pc++
 	less_significant := c8.Read(c8.pc)
 	c8.pc++
@@ -212,8 +208,8 @@ func (c8 *Chip8) execute() {
 
 		case 0x33:
 			c8.Write(c8.i, x)
-			c8.Write(c8.i + 1, x)
-			c8.Write(c8.i + 2, x)
+			c8.Write(c8.i+1, x)
+			c8.Write(c8.i+2, x)
 			log.Printf("LD\tB, V%d", x)
 
 		case 0x55:
@@ -250,6 +246,7 @@ func random() uint8 {
 }
 
 func (c8 Chip8) Run() {
+	c8.LoadFonts()
 	for c8.pc < 0xFFE {
 		c8.execute()
 	}
