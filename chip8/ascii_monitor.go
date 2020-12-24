@@ -23,7 +23,7 @@ func NewAsciiMonitor(width, height uint, enabledChar, disabledChar string) Ascii
 }
 
 func (g *AsciiMonitor) Clear() {
-	fmt.Println("---")
+	g.screenData = make([]bool, len(g.screenData))
 }
 
 func (g *AsciiMonitor) Draw() {
