@@ -23,7 +23,7 @@ func NewAsciiMonitor(width, height uint, enabledChar, disabledChar string) Ascii
 }
 
 func (g *AsciiMonitor) Clear() {
-	fmt.Print("\033[H\033[2J")
+	fmt.Println("---")
 }
 
 func (g *AsciiMonitor) Draw() {
