@@ -8,7 +8,7 @@ import (
 )
 
 type Chip8 struct {
-	g      AsciiMonitor
+	g      Monitor
 	memory []uint8
 	pc     uint16
 	v      []uint8

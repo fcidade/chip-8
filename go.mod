@@ -2,4 +2,4 @@ module github.com/franciscocid/vm
 
 go 1.15
 
-require golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e // indirect
+require github.com/therecipe/qt v0.0.0-20200904063919-c0c124a5770d
