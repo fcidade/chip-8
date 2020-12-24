@@ -1,6 +1,7 @@
 package chip8
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 )
@@ -73,6 +74,7 @@ func (c8 *Chip8) fetch() uint16 {
 
 func (c8 *Chip8) execute() {
 	code := c8.fetch()
+
 	switch code {
 	case 0x00E0:
 		c8.g.Clear()
@@ -114,6 +116,8 @@ func (c8 *Chip8) execute() {
 		log.Println(c8.v)
 
 	case 0x7000:
+		c8.v[x] += value
+
 		log.Printf("ADD\tV%d, 0x%02x", x, value)
 
 	case 0x8000:
@@ -164,13 +168,22 @@ func (c8 *Chip8) execute() {
 
 	case 0xD000:
 		nib := nibble(code)
-		sprite := c8.i
-		for i := uint16(0); i < nib; i++ {
-			if c8.Read(sprite) != 0 {
-				c8.g.PutPixel(uint(c8.v[x]), uint(c8.v[x]))
+		var (
+			width  uint8 = 4
+			height       = nib
+		)
+
+		fmt.Printf("\n")
+		for i := uint8(0); i < height; i++ {
+			currRow := c8.Read(c8.i + uint16(i))
+
+			for j := uint8(0); j < width; j++ {
+				if currRow&(0x80>>j) != 0 {
+					c8.g.PutPixel(uint(c8.v[x]+j), uint(c8.v[y]+i))
+				}
 			}
-			sprite++
 		}
+
 		c8.g.Draw()
 		log.Printf("DRW\tV%d, V%d, 0x%x", x, y, nib)
 
@@ -204,18 +217,23 @@ func (c8 *Chip8) execute() {
 			log.Printf("ADD\tI, V%d", x)
 
 		case 0x29:
+			spriteWidth := uint8(5)
+			c8.i = uint16(c8.v[x] * spriteWidth)
 			log.Printf("LD\tF, V%d", x)
 
 		case 0x33:
-			c8.Write(c8.i, x)
-			c8.Write(c8.i+1, x)
-			c8.Write(c8.i+2, x)
+			c8.Write(c8.i, c8.v[x]/100)
+			c8.Write(c8.i+1, c8.v[x]%100/10)
+			c8.Write(c8.i+2, c8.v[x]%10)
 			log.Printf("LD\tB, V%d", x)
 
 		case 0x55:
 			log.Printf("LD\t[I], V%d", x)
 
 		case 0x65:
+			for i := uint8(0); i <= x; i++ {
+				c8.v[i] = c8.Read(c8.i + uint16(i))
+			}
 			log.Printf("LD\tV%d, [I]", x)
 		}
 	}
@@ -237,8 +255,8 @@ func address(code uint16) uint16 {
 	return code & 0x0FFF
 }
 
-func nibble(code uint16) uint16 {
-	return code & 0x000F
+func nibble(code uint16) uint8 {
+	return uint8(code & 0x000F)
 }
 
 func random() uint8 {
