@@ -21,7 +21,7 @@ func main() {
 	}
 
 	// g := chip8.NewAsciiMonitor(64, 32, "█", ".")
-	g := chip8.NewQtMonitor(64, 32)
+	g := chip8.NewGuiMonitor(64, 32)
 	c8 := chip8.NewChip8(&g)
 	c8.LoadProgram(program)
 	c8.Run()
