@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"time"
 )
 
 type Chip8 struct {
-	g      Monitor
+	g      GuiMonitor
 	memory []uint8
 	pc     uint16
 	v      []uint8
@@ -17,7 +16,7 @@ type Chip8 struct {
 	st     uint8
 }
 
-func NewChip8(g Monitor) Chip8 {
+func NewChip8(g GuiMonitor) Chip8 {
 	return Chip8{
 		g:      g,
 		memory: make([]uint8, 0xFFF),
@@ -182,12 +181,11 @@ func (c8 *Chip8) execute() {
 
 			for j := uint8(0); j < width; j++ {
 				if currRow&(0x80>>j) != 0 {
-					c8.g.PutPixel(uint(c8.v[x]+j), uint(c8.v[y]+i))
+					c8.g.PutPixel(int(c8.v[x]+j), int(c8.v[y]+i))
 				}
 			}
 		}
 
-		c8.g.Draw()
 		log.Printf("DRW\tV%d, V%d, 0x%x", x, y, nib)
 
 	case 0xE000:
@@ -267,10 +265,12 @@ func random() uint8 {
 	return uint8(rand.Uint32() % 0xFF)
 }
 
-func (c8 Chip8) Run() {
-	c8.LoadFonts()
+func (c8 *Chip8) Tick() {
+	c8.execute()
+}
+
+func (c8 *Chip8) Run() {
 	for c8.pc < 0xFFE {
-		c8.execute()
-		time.Sleep(time.Second / 60)
+		c8.Tick()
 	}
 }

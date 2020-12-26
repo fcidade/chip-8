@@ -1,3 +1,5 @@
-module github.com/franciscocid/vm
+module github.com/franciscocid/chip8
 
 go 1.15
+
+require github.com/veandco/go-sdl2 v0.4.4
