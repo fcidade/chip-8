@@ -7,7 +7,7 @@ import (
 )
 
 type Chip8 struct {
-	g      GuiMonitor
+	g      *GuiMonitor
 	memory []uint8
 	pc     uint16
 	v      []uint8
@@ -16,7 +16,7 @@ type Chip8 struct {
 	st     uint8
 }
 
-func NewChip8(g GuiMonitor) Chip8 {
+func NewChip8(g *GuiMonitor) Chip8 {
 	return Chip8{
 		g:      g,
 		memory: make([]uint8, 0xFFF),
@@ -74,14 +74,17 @@ func (c8 *Chip8) fetch() uint16 {
 
 func (c8 *Chip8) execute() {
 	code := c8.fetch()
+	fmt.Printf("Fetch: %04x\n", code)
 
 	switch code {
 	case 0x00E0:
 		c8.g.Clear()
 		log.Printf("CLS")
+		return
 
 	case 0x00EE:
 		log.Printf("RET")
+		return
 	}
 
 	x := xRegister(code)
@@ -175,7 +178,6 @@ func (c8 *Chip8) execute() {
 			height       = nib
 		)
 
-		fmt.Printf("\n")
 		for i := uint8(0); i < height; i++ {
 			currRow := c8.Read(c8.i + uint16(i))
 
@@ -206,6 +208,13 @@ func (c8 *Chip8) execute() {
 			log.Printf("LD\tV%d, DT", x)
 
 		case 0x0A:
+			key := c8.g.KeyPressed()
+			if key > 0x0f {
+				c8.pc -= 2
+				// fmt.Println("Waiting key...")
+			} else {
+				// fmt.Println("Curr key:", key)
+			}
 
 			log.Printf("LD\tV%d, KEY", x)
 
@@ -267,10 +276,4 @@ func random() uint8 {
 
 func (c8 *Chip8) Tick() {
 	c8.execute()
-}
-
-func (c8 *Chip8) Run() {
-	for c8.pc < 0xFFE {
-		c8.Tick()
-	}
 }

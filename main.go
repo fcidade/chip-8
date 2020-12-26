@@ -14,6 +14,7 @@ func setup() {
 	runtime.LockOSThread()
 
 	log.SetOutput(ioutil.Discard)
+	log.Println("Starting...")
 
 	rand.Seed(time.Now().UnixNano())
 }
@@ -34,6 +35,7 @@ func main() {
 
 	g.Update(func() {
 		c8.Tick()
-		time.Sleep(time.Second / 10)
+		// time.Sleep(time.Second / 5)
+		time.Sleep(time.Second / 60)
 	})
 }
