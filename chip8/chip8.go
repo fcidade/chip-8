@@ -1,7 +1,7 @@
 package chip8
 
 import (
-	"fmt"
+	//"fmt"
 	"log"
 	"math/rand"
 )
@@ -10,18 +10,38 @@ type Chip8 struct {
 	g      *GuiMonitor
 	memory []uint8
 	pc     uint16
+	sp     uint8
+	stack  []uint16
 	v      []uint8
 	i      uint16
 	dt     uint8
 	st     uint8
 }
 
+func (c8 *Chip8) getI() uint16 {
+	return c8.i
+}
+
+func (c8 *Chip8) setI(value uint16) {
+	c8.i = value
+}
+
+func (c8 *Chip8) getV(number uint8) uint8 {
+	return c8.v[number]
+}
+
+func (c8 *Chip8) setV(number, value uint8) {
+	c8.v[number] = value
+}
+
 func NewChip8(g *GuiMonitor) Chip8 {
 	return Chip8{
 		g:      g,
 		memory: make([]uint8, 0xFFF),
-		v:      make([]uint8, 16),
+		v:      make([]uint8, 16, 16),
 		pc:     0x200,
+		sp:     0x0,
+		stack:  make([]uint16, 16),
 		i:      0x0000,
 	}
 }
@@ -74,7 +94,7 @@ func (c8 *Chip8) fetch() uint16 {
 
 func (c8 *Chip8) execute() {
 	code := c8.fetch()
-	fmt.Printf("Fetch: %04x\n", code)
+	log.Printf("Fetch: 0x%04x\n", code)
 
 	switch code {
 	case 0x00E0:
@@ -94,34 +114,44 @@ func (c8 *Chip8) execute() {
 
 	switch code & 0xF000 {
 	case 0x0000:
-		return
 		log.Printf("SYS\t0x%03x", addr)
 
 	case 0x1000:
 		c8.pc = addr
-
 		log.Printf("JMP\t0x%03x", addr)
 
 	case 0x2000:
+		c8.stack = append(c8.stack, c8.pc)
+		c8.sp++
+		c8.pc = addr
 		log.Printf("CALL\t0x%03x", addr)
 
 	case 0x3000:
+		if c8.getV(x) == value {
+			c8.pc += 2
+		}
 		log.Printf("SE\tV%d, 0x%03x", x, addr)
 
 	case 0x4000:
+		if c8.getV(x) != value {
+			c8.pc += 2
+		}
 		log.Printf("SNE\tV%d, 0x%02x", x, value)
 
 	case 0x5000:
+		if c8.getV(x) == c8.getV(y) {
+			c8.pc += 2
+		}
 		log.Printf("SNE\tV%d, V%d", x, y)
 
 	case 0x6000:
-		c8.v[x] = value
+		c8.setV(x, value)
 
 		log.Printf("LD\tV%d, 0x%02x", x, value)
 		log.Println(c8.v)
 
 	case 0x7000:
-		c8.v[x] += value
+		c8.setV(x, c8.getV(x) + value)
 
 		log.Printf("ADD\tV%d, 0x%02x", x, value)
 
@@ -130,30 +160,68 @@ func (c8 *Chip8) execute() {
 
 		switch suffix {
 		case 0x0:
+			c8.setV(x, c8.getV(y))
 			log.Printf("LD\tV%d, V%d", x, y)
 
 		case 0x1:
+			c8.setV(x, c8.getV(x) | c8.getV(y))
 			log.Printf("OR\tV%d, V%d", x, y)
 
 		case 0x2:
+			c8.setV(x, c8.getV(x) & c8.getV(y))
 			log.Printf("AND\tV%d, V%d", x, y)
 
 		case 0x3:
+			c8.setV(x, c8.getV(x) ^ c8.getV(y))
 			log.Printf("XOR\tV%d, V%d", x, y)
 
 		case 0x4:
+			sum := c8.getV(x) + c8.getV(y)
+			if sum > 0xFF {
+				c8.setV(0xF, 1)
+			} else {
+				c8.setV(0xF, 0)
+			}
+			c8.setV(x, sum & 0xFF)
 			log.Printf("ADD\tV%d, V%d", x, y)
 
 		case 0x5:
+			sub := c8.getV(x) - c8.getV(y)
+			if c8.getV(x) > c8.getV(y) {
+				c8.setV(0xF, 1)
+			} else {
+				c8.setV(0xF, 0)
+			}
+			c8.setV(x, sub & 0xFF)
 			log.Printf("SUB\tV%d, V%d", x, y)
 
 		case 0x6:
+			c8.setV(x, c8.getV(x) >> 1)
+			if c8.getV(x) & 0b1 == 1 {
+				c8.setV(0xF, 1)
+			} else {
+				c8.setV(0xF, 0)
+			}
 			log.Printf("SHR\tV%d, V%d", x, y)
 
 		case 0x7:
+			sub := c8.getV(y) - c8.getV(x)
+			if c8.getV(y) > c8.getV(x) {
+				c8.setV(0xF, 1)
+			} else {
+				c8.setV(0xF, 0)
+			}
+			c8.setV(x, sub & 0xFF)
 			log.Printf("SUBN\tV%d, V%d", x, y)
 
 		case 0xE:
+			c8.setV(x, c8.getV(x) << 1)
+			if c8.getV(x) & 0x80 == 1 {
+				c8.setV(0xF, 1)
+			} else {
+				c8.setV(0xF, 0)
+			}
+			log.Printf("SHR\tV%d, V%d", x, y)
 			log.Printf("SHL\tV%d, V%d", x, y)
 		}
 
@@ -161,14 +229,14 @@ func (c8 *Chip8) execute() {
 		log.Printf("SNE\tV%d, V%d", x, y)
 
 	case 0xA000:
-		c8.i = addr
+		c8.setI(addr)
 		log.Printf("LD\tI, 0x%03x", addr)
 
 	case 0xB000:
 		log.Printf("JMP\tV0, 0x%03x", addr)
 
 	case 0xC000:
-		c8.v[x] = random() & value
+		c8.setV(x, random() & value)
 		log.Printf("RND\tV%d, 0x%02x", x, value)
 
 	case 0xD000:
@@ -179,11 +247,11 @@ func (c8 *Chip8) execute() {
 		)
 
 		for i := uint8(0); i < height; i++ {
-			currRow := c8.Read(c8.i + uint16(i))
+			currRow := c8.Read(c8.getI() + uint16(i))
 
 			for j := uint8(0); j < width; j++ {
 				if currRow&(0x80>>j) != 0 {
-					c8.g.PutPixel(int(c8.v[x]+j), int(c8.v[y]+i))
+					c8.g.PutPixel(int(c8.getV(x)+j), int(c8.getV(y)+i))
 				}
 			}
 		}
@@ -211,9 +279,6 @@ func (c8 *Chip8) execute() {
 			key := c8.g.KeyPressed()
 			if key > 0x0f {
 				c8.pc -= 2
-				// fmt.Println("Waiting key...")
-			} else {
-				// fmt.Println("Curr key:", key)
 			}
 
 			log.Printf("LD\tV%d, KEY", x)
@@ -229,13 +294,13 @@ func (c8 *Chip8) execute() {
 
 		case 0x29:
 			spriteWidth := uint8(5)
-			c8.i = uint16(c8.v[x] * spriteWidth)
+			c8.setI(uint16(c8.getV(x) * spriteWidth))
 			log.Printf("LD\tF, V%d", x)
 
 		case 0x33:
-			c8.Write(c8.i, c8.v[x]/100)
-			c8.Write(c8.i+1, c8.v[x]%100/10)
-			c8.Write(c8.i+2, c8.v[x]%10)
+			c8.Write(c8.getI(), c8.getV(x)/100)
+			c8.Write(c8.getI()+1, c8.getV(x)%100/10)
+			c8.Write(c8.getI()+2, c8.getV(x)%10)
 			log.Printf("LD\tB, V%d", x)
 
 		case 0x55:
@@ -243,9 +308,9 @@ func (c8 *Chip8) execute() {
 
 		case 0x65:
 			for i := uint8(0); i <= x; i++ {
-				c8.v[i] = c8.Read(c8.i + uint16(i))
+				c8.setV(i, c8.Read(c8.getI() + uint16(i)))
 			}
-			log.Printf("LD\tV%d, [I]", x)
+			log.Printf("LD\tV%d, [I]\n", x)
 		}
 	}
 }

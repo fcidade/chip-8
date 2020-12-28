@@ -13,7 +13,7 @@ import (
 func setup() {
 	runtime.LockOSThread()
 
-	log.SetOutput(ioutil.Discard)
+	// log.SetOutput(ioutil.Discard)
 	log.Println("Starting...")
 
 	rand.Seed(time.Now().UnixNano())
@@ -22,7 +22,7 @@ func setup() {
 func main() {
 	setup()
 
-	program, err := ioutil.ReadFile("./programs/random_number_test.ch8")
+	program, err := ioutil.ReadFile("./programs/test_opcode.ch8")
 	if err != nil {
 		panic(err)
 	}

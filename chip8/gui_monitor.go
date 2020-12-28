@@ -119,7 +119,6 @@ func (g *GuiMonitor) handleKeys(key sdl.Keycode) {
 }
 
 func (g *GuiMonitor) KeyPressed() uint8 {
-	fmt.Println("----", g.lastKeyPressed)
 	aux := g.lastKeyPressed
 	g.setKey(0xFF)
 	return aux
