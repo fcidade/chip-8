@@ -42,7 +42,9 @@ func NewChip8(g *GuiMonitor) Chip8 {
 		pc:     0x200,
 		sp:     0x0,
 		stack:  make([]uint16, 16),
-		i:      0x0000,
+		i:      0x000,
+		dt:     0x00,
+		st:     0x00,
 	}
 }
 
@@ -103,6 +105,13 @@ func (c8 *Chip8) execute() {
 		return
 
 	case 0x00EE:
+		// TODO!!! Check if it's working
+
+		if c8.sp > 0 {
+			c8.sp--
+			c8.pc = c8.stack[c8.sp]
+			c8.stack = c8.stack[:c8.sp]
+		}
 		log.Printf("RET")
 		return
 	}
@@ -111,6 +120,7 @@ func (c8 *Chip8) execute() {
 	y := yRegister(code)
 	addr := address(code)
 	value := value(code)
+	key := c8.g.KeyPressed()
 
 	switch code & 0xF000 {
 	case 0x0000:
@@ -226,6 +236,9 @@ func (c8 *Chip8) execute() {
 		}
 
 	case 0x9000:
+		if c8.getV(x) != c8.getV(y) {
+			c8.pc += 2
+		}
 		log.Printf("SNE\tV%d, V%d", x, y)
 
 	case 0xA000:
@@ -233,6 +246,7 @@ func (c8 *Chip8) execute() {
 		log.Printf("LD\tI, 0x%03x", addr)
 
 	case 0xB000:
+		c8.pc = addr + uint16(c8.getV(0))
 		log.Printf("JMP\tV0, 0x%03x", addr)
 
 	case 0xC000:
@@ -256,6 +270,8 @@ func (c8 *Chip8) execute() {
 			}
 		}
 
+		// TODO: !!!!!!!!!!!!!!! CHECK COLLISION !!!!!!!!!!!!!!
+
 		log.Printf("DRW\tV%d, V%d, 0x%x", x, y, nib)
 
 	case 0xE000:
@@ -263,8 +279,14 @@ func (c8 *Chip8) execute() {
 
 		switch suffix {
 		case 0x9E:
+			if key == c8.getV(x) {
+				c8.pc += 2
+			}
 			log.Printf("SKP\tV%d", x)
 		case 0xA1:
+			if key != c8.getV(x) {
+				c8.pc += 2
+			}
 			log.Printf("SKNP\tV%d", x)
 		}
 
@@ -273,23 +295,27 @@ func (c8 *Chip8) execute() {
 
 		switch suffix {
 		case 0x07:
+			c8.setV(x, c8.dt)
 			log.Printf("LD\tV%d, DT", x)
 
 		case 0x0A:
-			key := c8.g.KeyPressed()
 			if key > 0x0f {
 				c8.pc -= 2
 			}
+			c8.setV(x, key)
 
 			log.Printf("LD\tV%d, KEY", x)
 
 		case 0x15:
+			c8.dt = c8.getV(x)
 			log.Printf("LD\tDT, V%d", x)
 
 		case 0x18:
+			c8.st = c8.getV(x)
 			log.Printf("LD\tST, V%d", x)
 
 		case 0x1E:
+			c8.i = c8.i + uint16(c8.getV(x))
 			log.Printf("ADD\tI, V%d", x)
 
 		case 0x29:
