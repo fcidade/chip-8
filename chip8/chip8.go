@@ -330,8 +330,11 @@ func (c8 *Chip8) execute() {
 			log.Printf("LD\tB, V%d", x)
 
 		case 0x55:
+			for i := uint8(0); i <= x; i++ {
+				c8.Write(c8.getI() + uint16(i), c8.getV(i))
+			}
 			log.Printf("LD\t[I], V%d", x)
-
+			
 		case 0x65:
 			for i := uint8(0); i <= x; i++ {
 				c8.setV(i, c8.Read(c8.getI() + uint16(i)))

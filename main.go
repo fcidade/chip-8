@@ -22,6 +22,7 @@ func setup() {
 func main() {
 	setup()
 
+	// program, err := ioutil.ReadFile("./programs/random_number_test.ch8")
 	program, err := ioutil.ReadFile("./programs/test_opcode.ch8")
 	if err != nil {
 		panic(err)
