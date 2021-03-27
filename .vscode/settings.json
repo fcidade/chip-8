@@ -1,9 +1,0 @@
-{
-  "go.lintTool":"golangci-lint",
-  "go.lintFlags": [
-    "--fast"
-  ],
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": false
-  },
-}
