@@ -1,18 +1,15 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/franciscocid/chip-8/chip8"
+	"github.com/franciscocid/chip-8/graphics"
 )
 
 func main() {
-	c8 := chip8.New()
-	fmt.Println(c8)
-
-	// g := graphics.New()
-	// err := g.Run(func(s *graphics.SDLGraphics) {})
-	// if err != nil {
-	// 	panic(err)
-	// }
+	chip8 := chip8.New()
+	g := graphics.New(chip8.Tick)
+	err := g.Run()
+	if err != nil {
+		panic(err)
+	}
 }

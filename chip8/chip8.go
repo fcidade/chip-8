@@ -8,21 +8,21 @@ type Graphics interface {
 }
 
 type Chip8 struct {
-	CurrState    *Chip8State
-	StateHistory []*Chip8State
+	CurrState    Chip8State
+	StateHistory []Chip8State
 	UI           Graphics
 }
 
 func (c *Chip8) LoadGame(gameData []uint8) {
-	c.StateHistory = make([]*Chip8State, 0)
+	c.StateHistory = make([]Chip8State, 0)
 
-	c.CurrState = &Chip8State{}
+	c.CurrState = Chip8State{}
 	for i, data := range gameData {
 		c.CurrState.Memory[i] = data
 	}
 }
 
-func (c *Chip8) Run() {
+func (c *Chip8) Tick() {
 	opcode := c.CurrState.Opcode()
 
 	newState := c.ExecuteOpcode(opcode)
@@ -31,7 +31,7 @@ func (c *Chip8) Run() {
 	c.CurrState = newState
 }
 
-func (c *Chip8) ExecuteOpcode(opcode uint16) (newState *Chip8State) {
+func (c *Chip8) ExecuteOpcode(opcode uint16) (newState Chip8State) {
 	switch opcode & 0xF000 {
 	case 0x0:
 		fmt.Println("SYS")
@@ -72,5 +72,8 @@ func (c *Chip8) ExecuteOpcode(opcode uint16) (newState *Chip8State) {
 }
 
 func New() *Chip8 {
-	return &Chip8{}
+	return &Chip8{
+		CurrState:    Chip8State{},
+		StateHistory: []Chip8State{},
+	}
 }

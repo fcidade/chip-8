@@ -16,9 +16,11 @@ type SDLGraphics struct {
 	running      bool
 	screenPixels []bool
 	renderer     *sdl.Renderer
+
+	tickFn func()
 }
 
-func (g *SDLGraphics) Run(fn func(*SDLGraphics)) error {
+func (g *SDLGraphics) Run() error {
 	err := g.setup()
 	if err != nil {
 		return err
@@ -29,8 +31,6 @@ func (g *SDLGraphics) Run(fn func(*SDLGraphics)) error {
 		g.handleEvents()
 
 		g.Clear()
-
-		fn(g)
 
 		g.renderer.SetDrawColor(255, 255, 255, 255)
 
@@ -92,11 +92,13 @@ func (g *SDLGraphics) handleEvents() {
 		case *sdl.QuitEvent:
 			fmt.Println("Quit")
 			g.running = false
+		case *sdl.KeyboardEvent:
+			g.tickFn()
 		}
 	}
 }
 
-func New() *SDLGraphics {
+func New(tickFn func()) *SDLGraphics {
 	return &SDLGraphics{
 		Title:         "Chip-8",
 		Width:         640,
@@ -105,5 +107,6 @@ func New() *SDLGraphics {
 		LogicalHeight: 32,
 		running:       true,
 		screenPixels:  make([]bool, 64*32),
+		tickFn:        tickFn,
 	}
 }
