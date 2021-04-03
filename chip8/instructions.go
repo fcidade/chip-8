@@ -11,11 +11,13 @@ func (c *Chip8) syscall(addr uint16) Chip8State {
 
 func (c *Chip8) clearScreen() Chip8State {
 	nextState := c.CurrState
-	// TODO!
-	fmt.Println("Clear screen")
+	c.UI.Clear()
+	fmt.Println("Screen cleared!")
 	return nextState
 }
 
+// returnFromSubroutine: RET instruction gets the address on  the top of
+// the stack and sets it as the current program counter, returning from the subroutine
 func (c *Chip8) returnFromSubroutine() Chip8State {
 	nextState := c.CurrState
 

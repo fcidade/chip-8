@@ -6,8 +6,10 @@ import (
 )
 
 func main() {
-	chip8 := chip8.New()
-	g := graphics.New(chip8.Tick)
+	c8 := chip8.New()
+	g := graphics.New(c8.Tick)
+	c8.UI = g
+
 	err := g.Run()
 	if err != nil {
 		panic(err)

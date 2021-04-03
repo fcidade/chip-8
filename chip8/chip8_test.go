@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/franciscocid/chip-8/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,12 +27,17 @@ func TestChip8(t *testing.T) {
 	})
 
 	t.Run("(CLS) Instruction 00E0 should clear the screen", func(t *testing.T) {
-		// TODO!
-		t.Skip()
 		c := New()
+		uiMock := new(mocks.Graphics)
+		uiMock.On("Clear").Return()
+		c.UI = uiMock
+
 		oldState := c.CurrState
-		newState := c.ExecuteOpcode(0x0000)
-		assert.Equal(t, oldState, newState, "")
+		newState := c.ExecuteOpcode(0x00E0)
+
+		assert.Equal(t, oldState, newState, "State should not be altered")
+		assert.True(t, uiMock.AssertCalled(t, "Clear"), "Graphics Clear function should have been called")
+		assert.True(t, uiMock.AssertNumberOfCalls(t, "Clear", 1), "Graphics Clear function should only have been called once")
 	})
 
 	t.Run("(RET) Instruction 00EE should return from a subroutine", func(t *testing.T) {
