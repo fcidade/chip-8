@@ -7,11 +7,11 @@ type Chip8State struct {
 	SoundTimer uint8
 	Memory     [0xFFF]uint8
 	Stack      [0xF]uint16
-	SP         uint16
+	SP         uint8
 	PC         uint16
 }
 
-func (c *Chip8State) Opcode() uint16 {
+func (c *Chip8State) FetchOpcode() uint16 {
 	mostSignificantByte := uint16(c.Memory[c.PC]) << 8
 	c.PC++
 	lessSignificantByte := uint16(c.Memory[c.PC])
