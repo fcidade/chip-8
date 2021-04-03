@@ -6,8 +6,9 @@ type Chip8State struct {
 	DelayTimer uint8
 	SoundTimer uint8
 	Memory     [0xFFF]uint8
-	PC         uint16
+	Stack      [0xF]uint16
 	SP         uint16
+	PC         uint16
 }
 
 func (c *Chip8State) Opcode() uint16 {

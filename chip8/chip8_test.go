@@ -3,6 +3,8 @@ package chip8
 import (
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestChip8State(t *testing.T) {
@@ -16,9 +18,28 @@ func TestChip8State(t *testing.T) {
 }
 
 func TestChip8(t *testing.T) {
-	t.Run("", func(t *testing.T) {
-		c := &Chip8{}
-		r := c.ExecuteOpcode(0x00E0)
-		fmt.Println(r)
+	t.Run("(SYS) Instructions on range 0nnn should be ignored, as they are actually SYS calls", func(t *testing.T) {
+		c := New()
+		oldState := c.CurrState
+		newState := c.ExecuteOpcode(0x0000)
+		assert.Equal(t, oldState, newState, "State should not be altered")
+	})
+
+	t.Run("(CLS) Instruction 00E0 should clear the screen", func(t *testing.T) {
+		// TODO!
+		t.Skip()
+		c := New()
+		oldState := c.CurrState
+		newState := c.ExecuteOpcode(0x0000)
+		assert.Equal(t, oldState, newState, "")
+	})
+
+	t.Run("(RET) Instruction 00EE should return from a subroutine", func(t *testing.T) {
+		// TODO!
+		t.Skip()
+		c := New()
+		oldState := c.CurrState
+		newState := c.ExecuteOpcode(0x0000)
+		assert.Equal(t, oldState, newState, "")
 	})
 }

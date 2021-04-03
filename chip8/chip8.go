@@ -1,7 +1,5 @@
 package chip8
 
-import "fmt"
-
 type Graphics interface {
 	Clear()
 	TogglePixel(x, y int) (isAlreadyToggled bool)
@@ -31,44 +29,37 @@ func (c *Chip8) Tick() {
 	c.CurrState = newState
 }
 
-func (c *Chip8) ExecuteOpcode(opcode uint16) (newState Chip8State) {
+func (c *Chip8) ExecuteOpcode(opcode uint16) Chip8State {
+	addr := opcode & 0x0FFF
+
+	switch opcode {
+	case 0x00E0:
+		return c.cls()
+	case 0x00EE:
+		return c.ret()
+	}
+
 	switch opcode & 0xF000 {
 	case 0x0:
-		fmt.Println("SYS")
+		return c.sys(addr)
 	case 0x1:
-		fmt.Println("JP")
+		return c.jmp(addr)
 	case 0x2:
-		fmt.Println("JP")
 	case 0x3:
-		fmt.Println("JP")
 	case 0x4:
-		fmt.Println("JP")
 	case 0x5:
-		fmt.Println("JP")
 	case 0x6:
-		fmt.Println("JP")
 	case 0x7:
-		fmt.Println("JP")
 	case 0x8:
-		fmt.Println("JP")
 	case 0x9:
-		fmt.Println("JP")
 	case 0xA:
-		fmt.Println("JP")
 	case 0xB:
-		fmt.Println("JP")
 	case 0xC:
-		fmt.Println("JP")
 	case 0xD:
-		fmt.Println("JP")
 	case 0xE:
-		fmt.Println("JP")
 	case 0xF:
-		fmt.Println("JP")
-	default:
-		fmt.Printf("Invalid opcode: 0x%04x\n", opcode)
 	}
-	return
+	return c.CurrState
 }
 
 func New() *Chip8 {
