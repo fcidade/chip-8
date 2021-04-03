@@ -11,10 +11,12 @@ type Chip8State struct {
 	PC         uint16
 }
 
-func (c *Chip8State) FetchOpcode() uint16 {
+func (c *Chip8State) Opcode() uint16 {
 	mostSignificantByte := uint16(c.Memory[c.PC]) << 8
-	c.PC++
-	lessSignificantByte := uint16(c.Memory[c.PC])
-	c.PC++
+	lessSignificantByte := uint16(c.Memory[c.PC+1])
 	return mostSignificantByte | lessSignificantByte
+}
+
+func (c *Chip8State) FetchNext() {
+	c.PC += 0x2
 }

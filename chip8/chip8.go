@@ -23,9 +23,10 @@ func (c *Chip8) LoadGame(gameData []uint8) {
 }
 
 func (c *Chip8) Tick() {
-	opcode := c.CurrState.FetchOpcode()
+	opcode := c.CurrState.Opcode()
 
 	newState := c.ExecuteOpcode(opcode)
+	newState.FetchNext()
 
 	c.StateHistory = append(c.StateHistory, c.CurrState)
 	c.CurrState = newState

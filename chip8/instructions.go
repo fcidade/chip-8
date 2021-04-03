@@ -9,6 +9,7 @@ func (c *Chip8) syscall(addr uint16) Chip8State {
 	return c.CurrState
 }
 
+// clearScreen: CLS instruction sends a signal to clear the user interface
 func (c *Chip8) clearScreen() Chip8State {
 	nextState := c.CurrState
 	c.UI.Clear()
@@ -50,17 +51,35 @@ func (c *Chip8) callSubroutine(addr uint16) Chip8State {
 	return nextState
 }
 
+// skipIfVxEqualValue: SE Vx, byte instruction should skip the next opcode if Vx value
+// equals the value in kk
 func (c *Chip8) skipIfVxEqualValue(x, value uint8) Chip8State {
-	fmt.Printf("Comparing if V%x value (0x%x) is equal to 0x%x\n", x, c.CurrState.V[x], value)
+	fmt.Printf("Skip next instruction if V%x value (0x%x) is equal to 0x%x\n", x, c.CurrState.V[x], value)
 	nextState := c.CurrState
-	// TODO!
+
+	if c.CurrState.V[x] == value {
+		nextState.FetchNext()
+		fmt.Printf("\tSkipped next instruction: OP %04x\n", nextState.Opcode())
+	} else {
+		fmt.Printf("\tContinue without skip\n")
+	}
+
 	return nextState
 }
 
+// skipIfVxNotEqualValue: SNE Vx, byte instruction should skip the next opcode if Vx value
+// is NOT equals the value in kk
 func (c *Chip8) skipIfVxNotEqualValue(x, value uint8) Chip8State {
-	fmt.Printf("Comparing if V%x value (0x%x) it *NOT* equal to 0x%x\n", x, c.CurrState.V[x], value)
+	fmt.Printf("Skip next instruction if V%x value (0x%x) is NOT equal to 0x%x\n", x, c.CurrState.V[x], value)
 	nextState := c.CurrState
-	// TODO!
+
+	if c.CurrState.V[x] != value {
+		nextState.FetchNext()
+		fmt.Printf("\tSkipped next instruction: OP %04x\n", nextState.Opcode())
+	} else {
+		fmt.Printf("\tContinue without skip\n")
+	}
+
 	return nextState
 }
 
