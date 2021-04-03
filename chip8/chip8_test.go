@@ -86,18 +86,7 @@ func TestChip8(t *testing.T) {
 		assert.Equal(t, uint16(0x200), newState.PC, "Program Counter should remain the same")
 	})
 
-	t.Run("(SE Vx, byte) Instruction 3xkk skips next instruction if Vx equals kk", func(t *testing.T) {
-		c := New()
-		c.CurrState.PC = 0x200
-		c.CurrState.V[0x0] = 0xFF
-
-		newState := c.ExecuteOpcode(0x40FF)
-
-		assert.Equal(t, uint8(0xFF), newState.V[0x0], "Vx should have the value 0xFF")
-		assert.Equal(t, uint16(0x200), newState.PC, "Program Counter should remain the same")
-	})
-
-	t.Run("(SE Vx, byte) Instruction 3xkk should NOT skip next instruction if Vx is NOT equal kk", func(t *testing.T) {
+	t.Run("(SNE Vx, byte) Instruction 3xkk skips next instruction if Vx is NOT equals kk", func(t *testing.T) {
 		c := New()
 		c.CurrState.PC = 0x200
 		c.CurrState.V[0x0] = 0x00
@@ -106,5 +95,16 @@ func TestChip8(t *testing.T) {
 
 		assert.NotEqual(t, uint8(0xFF), newState.V[0x0], "Vx should NOT have the value 0xFF")
 		assert.Equal(t, uint16(0x202), newState.PC, "Program Counter should increment by 2")
+	})
+
+	t.Run("(SNE Vx, byte) Instruction 3xkk should NOT skip next instruction if Vx equals kk", func(t *testing.T) {
+		c := New()
+		c.CurrState.PC = 0x200
+		c.CurrState.V[0x0] = 0xFF
+
+		newState := c.ExecuteOpcode(0x40FF)
+
+		assert.Equal(t, uint8(0xFF), newState.V[0x0], "Vx should have the value 0xFF")
+		assert.Equal(t, uint16(0x200), newState.PC, "Program Counter should remain the same")
 	})
 }
