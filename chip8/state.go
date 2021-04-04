@@ -1,7 +1,9 @@
 package chip8
 
-type Chip8State struct {
-	V          [0xF]uint8
+import "math"
+
+type State struct {
+	V          [0x10]uint8
 	I          uint16
 	DelayTimer uint8
 	SoundTimer uint8
@@ -11,12 +13,14 @@ type Chip8State struct {
 	PC         uint16
 }
 
-func (c *Chip8State) Opcode() uint16 {
+func (c *State) Opcode() uint16 {
 	mostSignificantByte := uint16(c.Memory[c.PC]) << 8
 	lessSignificantByte := uint16(c.Memory[c.PC+1])
 	return mostSignificantByte | lessSignificantByte
 }
 
-func (c *Chip8State) FetchNext() {
+func (c *State) FetchNext() {
 	c.PC += 0x2
+	c.DelayTimer = uint8(math.Max(0, float64(c.DelayTimer-1)))
+	c.SoundTimer = uint8(math.Max(0, float64(c.DelayTimer-1)))
 }

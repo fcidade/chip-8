@@ -8,15 +8,20 @@ type Graphics interface {
 }
 
 type Chip8 struct {
-	CurrState    Chip8State
-	StateHistory []Chip8State
+	CurrState    State
+	StateHistory []State
 	UI           Graphics
 }
 
-func (c *Chip8) LoadGame(gameData []uint8) {
-	c.StateHistory = make([]Chip8State, 0)
+const (
+	NibbleSize = 4
+	ByteSize   = NibbleSize * 2
+)
 
-	c.CurrState = Chip8State{}
+func (c *Chip8) LoadGame(gameData []uint8) {
+	c.StateHistory = make([]State, 0)
+
+	c.CurrState = State{}
 	for i, data := range gameData {
 		c.CurrState.Memory[i] = data
 	}
@@ -32,7 +37,7 @@ func (c *Chip8) Tick() {
 	c.CurrState = newState
 }
 
-func (c *Chip8) ExecuteOpcode(opcode uint16) Chip8State {
+func (c *Chip8) ExecuteOpcode(opcode uint16) State {
 	fmt.Printf("OP %04x\t", opcode)
 
 	switch opcode {
@@ -43,12 +48,12 @@ func (c *Chip8) ExecuteOpcode(opcode uint16) Chip8State {
 	}
 
 	addr := opcode & 0x0FFF
-	x := uint8(opcode & 0x0F00 >> 8)
-	y := uint8(opcode & 0x00F0 >> 4)
+	x := uint8(opcode & 0x0F00 >> ByteSize)
+	y := uint8(opcode & 0x00F0 >> NibbleSize)
 	value := uint8(opcode & 0x00FF)
 	nibble := uint8(opcode & 0x000F)
 
-	firstOpcodeByte := opcode >> 12
+	firstOpcodeByte := opcode >> (NibbleSize * 3)
 	switch firstOpcodeByte {
 	case 0x0:
 		return c.syscall(addr)
@@ -131,7 +136,7 @@ func (c *Chip8) ExecuteOpcode(opcode uint16) Chip8State {
 
 func New() *Chip8 {
 	return &Chip8{
-		CurrState:    Chip8State{},
-		StateHistory: []Chip8State{},
+		CurrState:    State{},
+		StateHistory: []State{},
 	}
 }
