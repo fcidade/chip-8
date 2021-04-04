@@ -271,6 +271,31 @@ func TestChip8(t *testing.T) {
 		assert.Equal(t, uint8(0b10100110), newState.V[0x0], "Vx bits should be shifted left once")
 		assert.Equal(t, uint8(0x01), newState.V[0xF], "VF should be set to 1, since most significant bit is 1")
 	})
+
+	t.Run("(SNE Vx, Vy) Instruction 9xkk skips next instruction if Vx is NOT equals Vy", func(t *testing.T) {
+		c := New()
+		c.CurrState.PC = 0x200
+		c.CurrState.V[0x0] = 0x00
+		c.CurrState.V[0x1] = 0x01
+
+		newState := c.ExecuteOpcode(0x9010)
+
+		assert.NotEqual(t, uint8(0xFF), newState.V[0x0], "Vx should NOT have the same value as the received")
+		assert.Equal(t, uint16(0x202), newState.PC, "Program Counter should increment by 2")
+	})
+
+	t.Run("(SNE Vx, Vy) Instruction 9xkk should NOT skip next instruction if Vx equals Vy", func(t *testing.T) {
+		c := New()
+		c.CurrState.PC = 0x200
+		c.CurrState.V[0x0] = 0xFF
+		c.CurrState.V[0x1] = 0xFF
+
+		newState := c.ExecuteOpcode(0x9010)
+
+		assert.Equal(t, uint8(0xFF), newState.V[0x0], "Vx should have the value same value as the received")
+		assert.Equal(t, uint16(0x200), newState.PC, "Program Counter should remain the same")
+	})
+
 }
 
 /*
@@ -278,9 +303,6 @@ Todo:
 	- Delay Timer e Sound timer
 	- Sound interface
 Rever os comandos:
-	- 8xy4: ADD tem q mexer com flag e tal
-	- 8xy5: SUB tem q mexer com flag e tal tbm
-	- 8xy6, 8xy7, 8xyE mexem com flag
 	- Dxyn: Esse vai ser complexo, o mais complexo até agora.
 	- Ex9E e ExA1: Mexem com tecla, n sei como vou fazer
 	- Fx0A: tecla tbm

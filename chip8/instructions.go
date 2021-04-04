@@ -87,7 +87,7 @@ func (c *Chip8) skipIfVxNotEqualValue(x, value uint8) State {
 // equals the value in Vy
 func (c *Chip8) skipIfVxEqualVy(x, y uint8) State {
 	vx, vy := c.CurrState.V[x], c.CurrState.V[y]
-	fmt.Printf("Skip next instruction if V%x value (0x%x) it equal to V%x value (0x%x)\n", x, vx, y, vy)
+	fmt.Printf("Skip next instruction if V%x value (0x%x) is equal to V%x value (0x%x)\n", x, vx, y, vy)
 
 	nextState := c.CurrState
 
@@ -207,6 +207,7 @@ func (c *Chip8) shiftVxRight(x uint8) State {
 	return nextState
 }
 
+// loadVySubtractedByVxIntoVx: SUB Vx, Vy Instruction 8xy7 should load the Vy subtracted by Vx value into Vx
 func (c *Chip8) loadVySubtractedByVxIntoVx(x, y uint8) State {
 	vx, vy := c.CurrState.V[x], c.CurrState.V[y]
 	fmt.Printf("Loading value of V%d (0x%02x) - V%d (0x%02x) into V%d\n", y, vy, x, vx, x)
@@ -225,7 +226,7 @@ func (c *Chip8) loadVySubtractedByVxIntoVx(x, y uint8) State {
 	return nextState
 }
 
-// shiftVxRight: SHL Vx {, Vy} Instruction 8xy6 should shift left the bits on Vx and VF should be set to 1 if most significant bit is 1
+// shiftVxRight: SHL Vx {, Vy} Instruction 8xyE should shift left the bits on Vx and VF should be set to 1 if most significant bit is 1
 func (c *Chip8) shiftVxLeft(x uint8) State {
 	fmt.Printf("Shifting left the value of V%d (0x%02x)\n", x, c.CurrState.V[x])
 	nextState := c.CurrState
@@ -236,12 +237,21 @@ func (c *Chip8) shiftVxLeft(x uint8) State {
 	return nextState
 }
 
+// skipIfVxNotEqualVy: SNE Vx, Vy instruction should skip the next opcode if Vx value
+// is NOT equals the value in Vy
 func (c *Chip8) skipIfVxNotEqualVy(x, y uint8) State {
-	vx := c.CurrState.V[x]
+	vx, vy := c.CurrState.V[x], c.CurrState.V[y]
+	fmt.Printf("Skip next instruction if V%x value (0x%x) is NOT equal to V%x value (0x%x)\n", x, vx, y, vy)
+
 	nextState := c.CurrState
-	vy := c.CurrState.V[y]
-	fmt.Printf("Comparing if V%x value (0x%x) it equal to V%x value (0x%x)\n", x, vx, y, vy)
-	// TODO!
+
+	if vx != vy {
+		nextState.FetchNext()
+		fmt.Printf("\tSkipped next instruction: OP %04x\n", nextState.Opcode())
+	} else {
+		fmt.Printf("\tContinue without skip\n")
+	}
+
 	return nextState
 }
 
