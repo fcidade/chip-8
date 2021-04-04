@@ -296,6 +296,49 @@ func TestChip8(t *testing.T) {
 		assert.Equal(t, uint16(0x200), newState.PC, "Program Counter should remain the same")
 	})
 
+	t.Run("(LD I, addr) Instruction Annn should load the received address into I", func(t *testing.T) {
+		c := New()
+		newState := c.ExecuteOpcode(0xA333)
+		assert.Equal(t, uint16(0x333), newState.I, "I should have the received address")
+	})
+
+	t.Run("(JMP V0, addr) Instruction Bnnn should jump the program counter to the received address + V0", func(t *testing.T) {
+		c := New()
+		c.CurrState.V[0x0] = 0x10
+		newState := c.ExecuteOpcode(0xB333)
+		assert.Equal(t, uint16(0x343), newState.PC, "Program Counter should have the V0 value + the received address")
+	})
+
+	t.Run("(RND Vx, byte) Instruction Cxkk should load a random value into Vx BITWISE AND received value", func(t *testing.T) {
+		t.Skip()
+		// TODO!
+		c := New()
+		c.CurrState.V[0x0] = 0x10
+		newState := c.ExecuteOpcode(0xB333)
+		assert.Equal(t, uint16(0x343), newState.PC, "Program Counter should have the V0 value + the received address")
+	})
+
+	t.Run("(LD Vx, DT) Instruction Fx07 should load the Delay Timer into Vx", func(t *testing.T) {
+		c := New()
+		c.CurrState.DelayTimer = 0x34
+		newState := c.ExecuteOpcode(0xF007)
+		assert.Equal(t, uint8(0x34), newState.V[0x0], "Vx should have the value of the Delay Timer")
+	})
+
+	t.Run("(LD Vx, DT) Instruction Fx15 should load the Vx value into Delay Timer", func(t *testing.T) {
+		c := New()
+		c.CurrState.V[0x1] = 0x34
+		newState := c.ExecuteOpcode(0xF115)
+		assert.Equal(t, uint8(0x34), newState.DelayTimer, "Delay Timer should have the value of Vx")
+	})
+
+	t.Run("(LD Vx, ST) Instruction Fx18 should load the Vx value into Sound Timer", func(t *testing.T) {
+		c := New()
+		c.CurrState.V[0x1] = 0x34
+		newState := c.ExecuteOpcode(0xF118)
+		assert.Equal(t, uint8(0x34), newState.SoundTimer, "Sound Timer should have the value of Vx")
+	})
+
 }
 
 /*
@@ -303,14 +346,11 @@ Todo:
 	- Delay Timer e Sound timer
 	- Sound interface
 Rever os comandos:
+	- Cxkk: Dos numeros randomicos, n sei como testar, acho q setando a seed
 	- Dxyn: Esse vai ser complexo, o mais complexo até agora.
 	- Ex9E e ExA1: Mexem com tecla, n sei como vou fazer
 	- Fx0A: tecla tbm
 	- Fx29: usa os digitos sprite
 	- Fx33: chatinho só
 	- Fx55 e Fx65: chatos tbm
-*/
-
-/*
-	- Rever SHIFT RIGHT E SHIFT LEFT pra ver se VY precisa ser igual ao VX
 */

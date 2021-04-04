@@ -255,15 +255,20 @@ func (c *Chip8) skipIfVxNotEqualVy(x, y uint8) State {
 	return nextState
 }
 
+// loadAddressIntoI: LD I, addr instruction Annn should load the received address into I
 func (c *Chip8) loadAddressIntoI(addr uint16) State {
-	fmt.Printf("Syscall w/ address: 0x%04x\n", addr)
+	fmt.Printf("Loading value 0x%03x into I\n", addr)
 	nextState := c.CurrState
+	nextState.I = addr
 	return nextState
 }
 
+// jumpToAddressPlusV0: JMP V0, addr instruction Bnnn should jump the program counter to the received address + V0
 func (c *Chip8) jumpToAddressPlusV0(addr uint16) State {
-	fmt.Printf("Syscall w/ address: 0x%04x\n", addr)
+	sum := uint16(c.CurrState.V[0x0]) + addr
+	fmt.Printf("Jump to address of V0 + %03x: 0x%03x\n", addr, sum)
 	nextState := c.CurrState
+	nextState.PC = sum
 	return nextState
 }
 
@@ -301,10 +306,9 @@ func (c *Chip8) skipIfVxKeyIsNotPressed(x, y uint8) State {
 }
 
 func (c *Chip8) loadDelayTimerIntoVx(x uint8) State {
+	fmt.Printf("Loading value 0x%02x into V%d\n", c.CurrState.DelayTimer, x)
 	nextState := c.CurrState
-	vx := c.CurrState.V[x]
-	fmt.Printf("Comparing if V%x value (0x%x) it equal to \n", x, vx)
-	// TODO!
+	nextState.V[x] = c.CurrState.DelayTimer
 	return nextState
 }
 
@@ -316,19 +320,19 @@ func (c *Chip8) waitButtonPressAndLoadIntoVx(x uint8) State {
 	return nextState
 }
 
+// LD Vx, DT Instruction Fx15 should load the Vx value into Delay Timer
 func (c *Chip8) loadVxIntoDelayTimer(x uint8) State {
+	fmt.Printf("Loading value V%x value (0x%02x) into Delay Timer\n", x, c.CurrState.V[x])
 	nextState := c.CurrState
-	vx := c.CurrState.V[x]
-	fmt.Printf("Comparing if V%x value (0x%x) it equal to \n", x, vx)
-	// TODO!
+	nextState.DelayTimer = nextState.V[x]
 	return nextState
 }
 
+// LD Vx, ST Instruction Fx18 should load the Vx value into Sound Timer
 func (c *Chip8) loadVxIntoSoundTimer(x uint8) State {
+	fmt.Printf("Loading value V%x value (0x%02x) into Sound Timer\n", x, c.CurrState.V[x])
 	nextState := c.CurrState
-	vx := c.CurrState.V[x]
-	fmt.Printf("Comparing if V%x value (0x%x) it equal to \n", x, vx)
-	// TODO!
+	nextState.SoundTimer = nextState.V[x]
 	return nextState
 }
 
