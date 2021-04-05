@@ -38,7 +38,7 @@ func (g *SDLGraphics) Run() error {
 
 		for i, active := range g.screenPixels {
 			if active {
-				g.renderer.DrawPoint(int32(i%g.LogicalWidth), int32(i%g.LogicalHeight))
+				g.renderer.DrawPoint(int32(i%g.LogicalWidth), int32(i/g.LogicalWidth))
 			}
 		}
 

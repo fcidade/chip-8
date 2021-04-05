@@ -281,7 +281,7 @@ func (c *Chip8) loadRandomValueBitwiseAndValueIntoVx(addr uint16) State {
 func (c *Chip8) drawSprite(x, y, nibble uint8) State {
 	vx := c.CurrState.V[x] % ScreenWidth
 	vy := c.CurrState.V[y] % ScreenHeight
-	fmt.Printf("Drawing a sprite on coords: %d, %d\n", vx, vy)
+	fmt.Printf("Drawing a sprite (0x%03x) on coords: %d, %d\n", c.CurrState.I, vx, vy)
 	width := 8
 	height := int(nibble)
 

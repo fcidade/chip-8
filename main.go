@@ -13,10 +13,10 @@ func main() {
 	g := graphics.New(c8.Tick)
 	c8.UI = g
 
-	file, err := os.Open("roms/BLINKY.ch8")
+	// file, err := os.Open("roms/BLINKY.ch8")
 	// file, err := os.Open("roms/random_number_test.ch8")
 	// file, err := os.Open("roms/test_opcode.ch8")
-	// file, err := os.Open("roms/IBM Logo.ch8")
+	file, err := os.Open("roms/IBM Logo.ch8")
 	if err != nil {
 		panic(err)
 	}
