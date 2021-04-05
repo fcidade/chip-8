@@ -14,6 +14,13 @@ type Chip8 struct {
 }
 
 const (
+	ScreenWidth         = 64
+	ScreenHeight        = 32
+	ProgramStartAddress = 0x200
+	FontsStartAddress   = 0x50
+)
+
+const (
 	NibbleSize = 4
 	ByteSize   = NibbleSize * 2
 )
@@ -21,17 +28,51 @@ const (
 func (c *Chip8) LoadGame(gameData []uint8) {
 	c.StateHistory = make([]State, 0)
 
-	c.CurrState = State{}
+	c.CurrState = State{
+		PC: ProgramStartAddress,
+	}
 	for i, data := range gameData {
-		c.CurrState.Memory[i] = data
+		c.CurrState.Memory[ProgramStartAddress+i] = data
+	}
+}
+
+func (c8 *Chip8) LoadFonts() {
+	fonts := []uint8{
+		0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+		0x20, 0x60, 0x20, 0x20, 0x70, // 1
+		0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+		0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+		0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+		0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+		0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+		0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+		0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+		0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+		0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+		0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+		0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+		0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+		0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+		0xF0, 0x80, 0xF0, 0x80, 0x80, // F
+	}
+	for addr, value := range fonts {
+		c8.CurrState.Memory[FontsStartAddress+addr] = value
 	}
 }
 
 func (c *Chip8) Tick() {
+	fmt.Printf("PC %03x\t", c.CurrState.PC)
 	opcode := c.CurrState.Opcode()
+	c.CurrState.PC += 2
 
 	newState := c.ExecuteOpcode(opcode)
-	newState.FetchNext()
+
+	if newState.DelayTimer > 0 {
+		newState.DelayTimer--
+	}
+	if newState.SoundTimer > 0 {
+		newState.SoundTimer--
+	}
 
 	c.StateHistory = append(c.StateHistory, c.CurrState)
 	c.CurrState = newState

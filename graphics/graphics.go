@@ -30,6 +30,8 @@ func (g *SDLGraphics) Run() error {
 
 		g.handleEvents()
 
+		g.tickFn()
+
 		g.Clear()
 
 		g.renderer.SetDrawColor(255, 255, 255, 255)
@@ -41,6 +43,8 @@ func (g *SDLGraphics) Run() error {
 		}
 
 		g.renderer.Present()
+
+		sdl.Delay(100)
 
 	}
 
@@ -93,7 +97,7 @@ func (g *SDLGraphics) handleEvents() {
 			fmt.Println("Quit")
 			g.running = false
 		case *sdl.KeyboardEvent:
-			g.tickFn()
+			// g.tickFn()
 		}
 	}
 }

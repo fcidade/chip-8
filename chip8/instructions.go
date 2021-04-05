@@ -58,7 +58,7 @@ func (c *Chip8) skipIfVxEqualValue(x, value uint8) State {
 	nextState := c.CurrState
 
 	if c.CurrState.V[x] == value {
-		nextState.FetchNext()
+		nextState.PC += 2
 		fmt.Printf("\tSkipped next instruction: OP %04x\n", nextState.Opcode())
 	} else {
 		fmt.Printf("\tContinue without skip\n")
@@ -74,7 +74,7 @@ func (c *Chip8) skipIfVxNotEqualValue(x, value uint8) State {
 	nextState := c.CurrState
 
 	if c.CurrState.V[x] != value {
-		nextState.FetchNext()
+		nextState.PC += 2
 		fmt.Printf("\tSkipped next instruction: OP %04x\n", nextState.Opcode())
 	} else {
 		fmt.Printf("\tContinue without skip\n")
@@ -92,7 +92,7 @@ func (c *Chip8) skipIfVxEqualVy(x, y uint8) State {
 	nextState := c.CurrState
 
 	if vx == vy {
-		nextState.FetchNext()
+		nextState.PC += 2
 		fmt.Printf("\tSkipped next instruction: OP %04x\n", nextState.Opcode())
 	} else {
 		fmt.Printf("\tContinue without skip\n")
@@ -246,7 +246,7 @@ func (c *Chip8) skipIfVxNotEqualVy(x, y uint8) State {
 	nextState := c.CurrState
 
 	if vx != vy {
-		nextState.FetchNext()
+		nextState.PC += 2
 		fmt.Printf("\tSkipped next instruction: OP %04x\n", nextState.Opcode())
 	} else {
 		fmt.Printf("\tContinue without skip\n")
@@ -279,28 +279,37 @@ func (c *Chip8) loadRandomValueBitwiseAndValueIntoVx(addr uint16) State {
 }
 
 func (c *Chip8) drawSprite(x, y, nibble uint8) State {
-	vx := c.CurrState.V[x]
+	vx := c.CurrState.V[x] % ScreenWidth
+	vy := c.CurrState.V[y] % ScreenHeight
+	fmt.Printf("Drawing a sprite on coords: %d, %d\n", vx, vy)
+	width := 8
+	height := int(nibble)
+
+	for row := 0; row < height; row++ {
+		sprite := c.CurrState.Memory[int(c.CurrState.I)+row]
+		for col := 0; col < width; col++ {
+			if sprite&(0x80>>col) != 0 {
+				c.UI.TogglePixel(int(vx)+col, int(vy)+row)
+				// fmt.Println(hasCollided)
+			}
+		}
+	}
+
 	nextState := c.CurrState
-	vy := c.CurrState.V[y]
-	fmt.Printf("Comparing if V%x value (0x%x) it equal to V%x value (0x%x)\n", x, vx, y, vy)
-	// TODO!
+	nextState.V[0xF] = 0
 	return nextState
 }
 
 func (c *Chip8) skipIfVxKeyIsPressed(x, y uint8) State {
-	vx := c.CurrState.V[x]
 	nextState := c.CurrState
-	vy := c.CurrState.V[y]
-	fmt.Printf("Comparing if V%x value (0x%x) it equal to V%x value (0x%x)\n", x, vx, y, vy)
+	fmt.Printf("NOT IMPLEMENTED!!")
 	// TODO!
 	return nextState
 }
 
 func (c *Chip8) skipIfVxKeyIsNotPressed(x, y uint8) State {
-	vx := c.CurrState.V[x]
 	nextState := c.CurrState
-	vy := c.CurrState.V[y]
-	fmt.Printf("Comparing if V%x value (0x%x) it equal to V%x value (0x%x)\n", x, vx, y, vy)
+	fmt.Printf("NOT IMPLEMENTED!!")
 	// TODO!
 	return nextState
 }
@@ -314,8 +323,7 @@ func (c *Chip8) loadDelayTimerIntoVx(x uint8) State {
 
 func (c *Chip8) waitButtonPressAndLoadIntoVx(x uint8) State {
 	nextState := c.CurrState
-	vx := c.CurrState.V[x]
-	fmt.Printf("Comparing if V%x value (0x%x) it equal to \n", x, vx)
+	fmt.Printf("NOT IMPLEMENTED!!")
 	// TODO!
 	return nextState
 }
@@ -338,40 +346,35 @@ func (c *Chip8) loadVxIntoSoundTimer(x uint8) State {
 
 func (c *Chip8) addVxToI(x uint8) State {
 	nextState := c.CurrState
-	vx := c.CurrState.V[x]
-	fmt.Printf("Comparing if V%x value (0x%x) it equal to \n", x, vx)
+	fmt.Printf("NOT IMPLEMENTED!!")
 	// TODO!
 	return nextState
 }
 
 func (c *Chip8) loadVxDigitSpriteAddressIntoI(x uint8) State {
 	nextState := c.CurrState
-	vx := c.CurrState.V[x]
-	fmt.Printf("Comparing if V%x value (0x%x) it equal to \n", x, vx)
+	fmt.Printf("NOT IMPLEMENTED!!")
 	// TODO!
 	return nextState
 }
 
 func (c *Chip8) loadVxDigitsIntoI(x uint8) State {
 	nextState := c.CurrState
-	vx := c.CurrState.V[x]
-	fmt.Printf("Comparing if V%x value (0x%x) it equal to \n", x, vx)
+	fmt.Printf("NOT IMPLEMENTED!!")
 	// TODO!
 	return nextState
 }
 
 func (c *Chip8) loadRangeV0ToVxIntoMemoryStartingFromI(x uint8) State {
 	nextState := c.CurrState
-	vx := c.CurrState.V[x]
-	fmt.Printf("Comparing if V%x value (0x%x) it equal to \n", x, vx)
+	fmt.Printf("NOT IMPLEMENTED!!")
 	// TODO!
 	return nextState
 }
 
 func (c *Chip8) loadMemoryStartingFromIIntoRangeV0ToVx(x uint8) State {
 	nextState := c.CurrState
-	vx := c.CurrState.V[x]
-	fmt.Printf("Comparing if V%x value (0x%x) it equal to \n", x, vx)
+	fmt.Printf("NOT IMPLEMENTED!!")
 	// TODO!
 	return nextState
 }
