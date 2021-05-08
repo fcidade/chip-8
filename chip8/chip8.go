@@ -17,6 +17,7 @@ const (
 const (
 	NibbleSize         = 4
 	ByteSize           = NibbleSize * 2
+	FirstFontBitMask   = 0x80
 	FirstScreenBitMask = 0x1 << (ByteSize * 7)
 )
 

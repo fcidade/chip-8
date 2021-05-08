@@ -333,11 +333,12 @@ func TestChip8(t *testing.T) {
 		assert.Equal(t, uint8(0x34), newState.SoundTimer, "Sound Timer should have the value of Vx")
 	})
 
-	t.Run("(LD Vx, ST) Instruction Fx18 should load the Vx value into Sound Timer", func(t *testing.T) {
+	t.Run("(ADD I, Vx) Instruction Fx1E should add the value of Vx into the existing value in I", func(t *testing.T) {
 		c := New()
-		c.CurrState.V[0x1] = 0x34
-		newState := c.ExecuteOpcode(0xF118)
-		assert.Equal(t, uint8(0x34), newState.SoundTimer, "Sound Timer should have the value of Vx")
+		c.CurrState.V[0x1] = 0x60
+		c.CurrState.I = 0x100
+		newState := c.ExecuteOpcode(0xF11E)
+		assert.Equal(t, uint16(0x160), newState.I, "I should have the value of I + Vx")
 	})
 
 }

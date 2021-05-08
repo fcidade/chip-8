@@ -297,12 +297,10 @@ func (c *Chip8) drawSprite(x, y, nibble uint8) State {
 			if isAlreadyPainted {
 				nextState.V[0xF] = 0x01
 			}
-			if sprite&(0x80>>col) != 0 {
+			if sprite&(FirstFontBitMask>>col) != 0 {
 				nextState.SetPixel(vx+col, vy+row)
 			}
 		}
-
-		//TODO é o oposto? n lembro
 	}
 
 	return nextState
@@ -352,10 +350,11 @@ func (c *Chip8) loadVxIntoSoundTimer(x uint8) State {
 	return nextState
 }
 
+// addVxToI: ADD I, Vx instruction Fx1E adds the value of Vx into the existing value in I
 func (c *Chip8) addVxToI(x uint8) State {
 	nextState := c.CurrState
-	fmt.Printf("NOT IMPLEMENTED!!")
-	// TODO!
+	fmt.Printf("Loading value of I (0x%03x) + V%d (0x%02x) into I\n", c.CurrState.I, x, c.CurrState.V[x])
+	nextState.I += uint16(c.CurrState.V[x])
 	return nextState
 }
 
