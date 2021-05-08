@@ -12,7 +12,7 @@ func (c *Chip8) syscall(addr uint16) State {
 // clearScreen: CLS instruction sends a signal to clear the user interface
 func (c *Chip8) clearScreen() State {
 	nextState := c.CurrState
-	nextState.Graphics = [ScreenHeight][ScreenWidth]bool{}
+	nextState.Graphics = [ScreenHeight]uint64{}
 	fmt.Println("Screen cleared!")
 	return nextState
 }
@@ -273,8 +273,9 @@ func (c *Chip8) jumpToAddressPlusV0(addr uint16) State {
 }
 
 func (c *Chip8) loadRandomValueBitwiseAndValueIntoVx(addr uint16) State {
-	fmt.Printf("Syscall w/ address: 0x%04x\n", addr)
 	nextState := c.CurrState
+	fmt.Printf("NOT IMPLEMENTED!!")
+	// TODO!
 	return nextState
 }
 
@@ -290,15 +291,18 @@ func (c *Chip8) drawSprite(x, y, nibble uint8) State {
 	for row := uint8(0); row < height; row++ {
 		spriteRow := c.CurrState.I + uint16(row)
 		sprite := c.CurrState.Memory[spriteRow]
+
 		for col := uint8(0); col < width; col++ {
-			isAlreadyPainted := nextState.Graphics[vy+row][vx+col]
+			isAlreadyPainted := c.CurrState.GetPixel(x, y)
 			if isAlreadyPainted {
 				nextState.V[0xF] = 0x01
 			}
 			if sprite&(0x80>>col) != 0 {
-				nextState.Graphics[vy+row][vx+col] = !isAlreadyPainted
+				nextState.SetPixel(vx+col, vy+row)
 			}
 		}
+
+		//TODO é o oposto? n lembro
 	}
 
 	return nextState

@@ -33,10 +33,10 @@ func (g *SDLGraphics) Run() error {
 
 		g.renderer.SetDrawColor(255, 255, 255, 255)
 
-		for y, vline := range c8.CurrState.Graphics {
-			for x, painted := range vline {
-				if painted {
-					g.renderer.DrawPoint(int32(y), int32(x))
+		for y := uint8(0); y < ScreenHeight; y++ {
+			for x := uint8(0); x < ScreenWidth; x++ {
+				if c8.CurrState.GetPixel(x, y) {
+					g.renderer.DrawPoint(int32(x), int32(y))
 				}
 			}
 		}

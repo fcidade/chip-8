@@ -15,8 +15,9 @@ const (
 )
 
 const (
-	NibbleSize = 4
-	ByteSize   = NibbleSize * 2
+	NibbleSize         = 4
+	ByteSize           = NibbleSize * 2
+	FirstScreenBitMask = 0x1 << (ByteSize * 7)
 )
 
 func (c *Chip8) LoadGame(gameData []uint8) {

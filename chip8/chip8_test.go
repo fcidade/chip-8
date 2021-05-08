@@ -7,19 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGraphicsLogic(t *testing.T) {
-	s := State{}
-	for y, vline := range s.Graphics {
-		fmt.Print(y, "\t")
-		for x, painted := range vline {
-			if painted {
-			}
-			fmt.Print(x)
-		}
-		fmt.Println()
-	}
-}
-
 func TestChip8State(t *testing.T) {
 	t.Run("", func(t *testing.T) {
 		t.Skip()
@@ -41,10 +28,10 @@ func TestChip8(t *testing.T) {
 	t.Run("(CLS) Instruction 00E0 should clear the screen", func(t *testing.T) {
 		c := New()
 
-		c.CurrState.Graphics = [32][64]bool{{true, true}, {true}}
+		c.CurrState.Graphics = [32]uint64{0, 1, 2, 3, 4}
 		newState := c.ExecuteOpcode(0x00E0)
 
-		assert.Equal(t, newState.Graphics, [32][64]bool{}, "Graphics should be all zeroes")
+		assert.Equal(t, newState.Graphics, [32]uint64{}, "Graphics should be all zeroes")
 	})
 
 	t.Run("(RET) Instruction 00EE should return from a subroutine", func(t *testing.T) {
@@ -337,6 +324,13 @@ func TestChip8(t *testing.T) {
 		c.CurrState.V[0x1] = 0x34
 		newState := c.ExecuteOpcode(0xF115)
 		assert.Equal(t, uint8(0x34), newState.DelayTimer, "Delay Timer should have the value of Vx")
+	})
+
+	t.Run("(LD Vx, ST) Instruction Fx18 should load the Vx value into Sound Timer", func(t *testing.T) {
+		c := New()
+		c.CurrState.V[0x1] = 0x34
+		newState := c.ExecuteOpcode(0xF118)
+		assert.Equal(t, uint8(0x34), newState.SoundTimer, "Sound Timer should have the value of Vx")
 	})
 
 	t.Run("(LD Vx, ST) Instruction Fx18 should load the Vx value into Sound Timer", func(t *testing.T) {
