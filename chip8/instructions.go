@@ -376,7 +376,7 @@ func (c *Chip8) loadVxDigitSpriteAddressIntoI(x uint8) State {
 func (c *Chip8) loadVxDigitsIntoI(x uint8) State {
 	nextState := c.CurrState
 	vx := c.CurrState.V[x]
-	fmt.Printf("Loading digits of the V%x (%d) into I (0x%03x), I+1 and I+2", x, vx, c.CurrState.I)
+	fmt.Printf("Loading digits of the V%d (%x) into I (0x%03x), I+1 and I+2", x, vx, c.CurrState.I)
 	firstDigit := vx / 100
 	secondDigit := vx / 10 % 10
 	thirdDigit := vx % 10
@@ -386,16 +386,22 @@ func (c *Chip8) loadVxDigitsIntoI(x uint8) State {
 	return nextState
 }
 
+// loadRangeV0ToVxIntoMemoryStartingFromI: (LD [I], Vx) Instruction Fx55 should loads the V[0:x] into memory starting by I
 func (c *Chip8) loadRangeV0ToVxIntoMemoryStartingFromI(x uint8) State {
 	nextState := c.CurrState
-	fmt.Printf("NOT IMPLEMENTED!!")
-	// TODO!
+	fmt.Printf("Loading values from V0 to V%d starting from I (0x%03x)", x, c.CurrState.I)
+	for i := uint8(0); i <= x; i++ {
+		nextState.Memory[c.CurrState.I+uint16(i)] = c.CurrState.V[i]
+	}
 	return nextState
 }
 
+// loadMemoryStartingFromIIntoRangeV0ToVx: (LD Vx, [I]) Instruction Fx65 should loads the into V[0:x] the memory values starting by I
 func (c *Chip8) loadMemoryStartingFromIIntoRangeV0ToVx(x uint8) State {
 	nextState := c.CurrState
-	fmt.Printf("NOT IMPLEMENTED!!")
-	// TODO!
+	fmt.Printf("Loading values into V0 to V%d starting from I (0x%03x)", x, c.CurrState.I)
+	for i := uint8(0); i <= x; i++ {
+		nextState.V[i] = c.CurrState.Memory[c.CurrState.I+uint16(i)]
+	}
 	return nextState
 }

@@ -359,6 +359,46 @@ func TestChip8(t *testing.T) {
 		assert.Equal(t, uint8(7), newState.Memory[0x212], "Should have the right digit")
 	})
 
+	t.Run("(LD [I], Vx) Instruction Fx55 should loads the V[0:x] into memory starting by I", func(t *testing.T) {
+		c := New()
+		c.CurrState.V[0x0] = 0x00
+		c.CurrState.V[0x1] = 0x01
+		c.CurrState.V[0x2] = 0x02
+		c.CurrState.V[0x3] = 0x03
+		c.CurrState.V[0x4] = 0x04
+		c.CurrState.V[0x5] = 0x05
+		c.CurrState.V[0x6] = 0x06
+		c.CurrState.I = 0x210
+		newState := c.ExecuteOpcode(0xF655)
+		assert.Equal(t, uint8(0x00), newState.Memory[0x210], "Should have the right value")
+		assert.Equal(t, uint8(0x01), newState.Memory[0x211], "Should have the right value")
+		assert.Equal(t, uint8(0x02), newState.Memory[0x212], "Should have the right value")
+		assert.Equal(t, uint8(0x03), newState.Memory[0x213], "Should have the right value")
+		assert.Equal(t, uint8(0x04), newState.Memory[0x214], "Should have the right value")
+		assert.Equal(t, uint8(0x05), newState.Memory[0x215], "Should have the right value")
+		assert.Equal(t, uint8(0x06), newState.Memory[0x216], "Should have the right value")
+	})
+
+	t.Run("(LD Vx, [I]) Instruction Fx65 should loads the into V[0:x] the memory values starting by I", func(t *testing.T) {
+		c := New()
+		c.CurrState.Memory[0x200] = 0x00
+		c.CurrState.Memory[0x201] = 0x01
+		c.CurrState.Memory[0x202] = 0x02
+		c.CurrState.Memory[0x203] = 0x03
+		c.CurrState.Memory[0x204] = 0x04
+		c.CurrState.Memory[0x205] = 0x05
+		c.CurrState.Memory[0x206] = 0x06
+		c.CurrState.I = 0x200
+		newState := c.ExecuteOpcode(0xF665)
+		assert.Equal(t, uint8(0x00), newState.V[0x0], "Should have the right value")
+		assert.Equal(t, uint8(0x01), newState.V[0x1], "Should have the right value")
+		assert.Equal(t, uint8(0x02), newState.V[0x2], "Should have the right value")
+		assert.Equal(t, uint8(0x03), newState.V[0x3], "Should have the right value")
+		assert.Equal(t, uint8(0x04), newState.V[0x4], "Should have the right value")
+		assert.Equal(t, uint8(0x05), newState.V[0x5], "Should have the right value")
+		assert.Equal(t, uint8(0x06), newState.V[0x6], "Should have the right value")
+	})
+
 }
 
 /*
