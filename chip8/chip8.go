@@ -169,7 +169,7 @@ func (c *Chip8) ExecuteOpcode(opcode uint16) State {
 			return c.loadMemoryStartingFromIIntoRangeV0ToVx(x)
 		}
 	}
-	return c.invalidOpcode()
+	return c.CurrState
 }
 
 func New() *Chip8 {
