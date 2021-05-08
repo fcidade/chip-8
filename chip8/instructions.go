@@ -1,6 +1,9 @@
 package chip8
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+)
 
 // syscall: SYS instructions were originally called on chip-8 computers
 // but we don't need them on our emulation, so they're just gonna be ignored.
@@ -272,20 +275,22 @@ func (c *Chip8) jumpToAddressPlusV0(addr uint16) State {
 	return nextState
 }
 
-func (c *Chip8) loadRandomValueBitwiseAndValueIntoVx(addr uint16) State {
+// loadRandomValueBitwiseAndValueIntoVx: RND Vx, byte instruction Cxkk should load a random value into Vx BITWISE AND received value
+func (c *Chip8) loadRandomValueBitwiseAndValueIntoVx(x, value uint8) State {
 	nextState := c.CurrState
-	fmt.Printf("NOT IMPLEMENTED!!")
-	// TODO!
+	randomValue := uint8(rand.Intn(0x100)) & value
+	fmt.Printf("Loading value 0x%02x into V%d\n", randomValue, x)
+	nextState.V[x] = randomValue
 	return nextState
 }
 
-func (c *Chip8) drawSprite(x, y, nibble uint8) State {
-	nextState := c.CurrState
+func (c *Chip8) drawSprite(x, y, value uint8) State {
 	vx := c.CurrState.V[x] % ScreenWidth
 	vy := c.CurrState.V[y] % ScreenHeight
 	fmt.Printf("Drawing a sprite (0x%03x) on coords: %d, %d\n", c.CurrState.I, vx, vy)
+	nextState := c.CurrState
 	var width uint8 = 8
-	var height uint8 = nibble
+	var height uint8 = value
 
 	nextState.V[0xF] = 0x00
 	for row := uint8(0); row < height; row++ {
@@ -384,9 +389,4 @@ func (c *Chip8) loadMemoryStartingFromIIntoRangeV0ToVx(x uint8) State {
 	fmt.Printf("NOT IMPLEMENTED!!")
 	// TODO!
 	return nextState
-}
-
-func (c *Chip8) invalidOpcode() State {
-	fmt.Println("Invalid opcode! Ignoring...")
-	return c.CurrState
 }

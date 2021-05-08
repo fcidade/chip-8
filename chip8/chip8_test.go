@@ -2,6 +2,7 @@ package chip8
 
 import (
 	"fmt"
+	"math/rand"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -304,12 +305,10 @@ func TestChip8(t *testing.T) {
 	})
 
 	t.Run("(RND Vx, byte) Instruction Cxkk should load a random value into Vx BITWISE AND received value", func(t *testing.T) {
-		t.Skip()
-		// TODO!
 		c := New()
-		c.CurrState.V[0x0] = 0x10
-		newState := c.ExecuteOpcode(0xB333)
-		assert.Equal(t, uint16(0x343), newState.PC, "Program Counter should have the V0 value + the received address")
+		rand.Seed(1)
+		newState := c.ExecuteOpcode(0xC101)
+		assert.Equal(t, uint8(0x01), newState.V[0x1], "Program Counter should have the V0 value + the received address")
 	})
 
 	t.Run("(LD Vx, DT) Instruction Fx07 should load the Delay Timer into Vx", func(t *testing.T) {
@@ -346,13 +345,13 @@ func TestChip8(t *testing.T) {
 /*
 Todo:
 	- Delay Timer e Sound timer
-	- Sound interface
 Rever os comandos:
 	- Cxkk: Dos numeros randomicos, n sei como testar, acho q setando a seed
-	- Dxyn: Esse vai ser complexo, o mais complexo até agora.
-	- Ex9E e ExA1: Mexem com tecla, n sei como vou fazer
-	- Fx0A: tecla tbm
+
 	- Fx29: usa os digitos sprite
 	- Fx33: chatinho só
 	- Fx55 e Fx65: chatos tbm
+
+	- Ex9E e ExA1: Mexem com tecla, n sei como vou fazer
+	- Fx0A: tecla tbm
 */

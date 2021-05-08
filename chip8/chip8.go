@@ -137,7 +137,7 @@ func (c *Chip8) ExecuteOpcode(opcode uint16) State {
 	case 0xB:
 		return c.jumpToAddressPlusV0(addr)
 	case 0xC:
-		return c.loadRandomValueBitwiseAndValueIntoVx(addr)
+		return c.loadRandomValueBitwiseAndValueIntoVx(x, value)
 	case 0xD:
 		return c.drawSprite(x, y, nibble)
 	case 0xE:

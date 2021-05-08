@@ -2,6 +2,7 @@ package main
 
 import (
 	"io"
+	"math/rand"
 	"os"
 
 	"github.com/franciscocid/chip-8/chip8"
@@ -10,6 +11,7 @@ import (
 func main() {
 	c8 := chip8.New()
 	g := chip8.NewGraphicsSDL(c8.Tick)
+	rand.Seed(1)
 
 	// file, err := os.Open("roms/BLINKY.ch8")
 	// file, err := os.Open("roms/random_number_test.ch8")
