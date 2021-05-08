@@ -8,7 +8,7 @@ import (
 // syscall: SYS instructions were originally called on chip-8 computers
 // but we don't need them on our emulation, so they're just gonna be ignored.
 func (c *Chip8) syscall(addr uint16) State {
-	fmt.Printf("Syscall w/ address: 0x%04x\n", addr)
+	fmt.Printf("Syscall w/ address: 0x%04x", addr)
 	return c.CurrState
 }
 
@@ -29,14 +29,14 @@ func (c *Chip8) returnFromSubroutine() State {
 	nextState.PC = addressToReturn
 	nextState.SP--
 
-	fmt.Printf("Return from subroutine to address: 0x%04x\n", addressToReturn)
+	fmt.Printf("Return from subroutine to address: 0x%04x", addressToReturn)
 	return nextState
 }
 
 // jumpToAddress: SYS instruction sets the current program counter to the
 // address received
 func (c *Chip8) jumpToAddress(addr uint16) State {
-	fmt.Printf("Jump to address: 0x%03x\n", addr)
+	fmt.Printf("Jump to address: 0x%03x", addr)
 	nextState := c.CurrState
 	nextState.PC = addr
 	return nextState
@@ -45,7 +45,7 @@ func (c *Chip8) jumpToAddress(addr uint16) State {
 // callSubroutine: CALL instruction adds current program counter to the stack and
 // sets it to the received address
 func (c *Chip8) callSubroutine(addr uint16) State {
-	fmt.Printf("Call subroutine on address: 0x%04x\n", addr)
+	fmt.Printf("Call subroutine on address: 0x%04x", addr)
 	nextState := c.CurrState
 
 	nextState.Stack[c.CurrState.SP] = c.CurrState.PC
@@ -57,14 +57,14 @@ func (c *Chip8) callSubroutine(addr uint16) State {
 // skipIfVxEqualValue: SE Vx, byte instruction should skip the next opcode if Vx value
 // equals the value in kk
 func (c *Chip8) skipIfVxEqualValue(x, value uint8) State {
-	fmt.Printf("Skip next instruction if V%x value (0x%x) is equal to 0x%x\n", x, c.CurrState.V[x], value)
+	fmt.Printf("Skip next instruction if V%x value (0x%x) is equal to 0x%x", x, c.CurrState.V[x], value)
 	nextState := c.CurrState
 
 	if c.CurrState.V[x] == value {
 		nextState.PC += 2
-		fmt.Printf("\tSkipped next instruction: OP %04x\n", nextState.Opcode())
+		fmt.Printf(" -> Skipped next instruction: OP %04x", nextState.Opcode())
 	} else {
-		fmt.Printf("\tContinue without skip\n")
+		fmt.Printf(" -> Continued without skip")
 	}
 
 	return nextState
@@ -73,14 +73,14 @@ func (c *Chip8) skipIfVxEqualValue(x, value uint8) State {
 // skipIfVxNotEqualValue: SNE Vx, byte instruction should skip the next opcode if Vx value
 // is NOT equals the value in kk
 func (c *Chip8) skipIfVxNotEqualValue(x, value uint8) State {
-	fmt.Printf("Skip next instruction if V%x value (0x%x) is NOT equal to 0x%x\n", x, c.CurrState.V[x], value)
+	fmt.Printf("Skip next instruction if V%x value (0x%x) is NOT equal to 0x%x", x, c.CurrState.V[x], value)
 	nextState := c.CurrState
 
 	if c.CurrState.V[x] != value {
 		nextState.PC += 2
-		fmt.Printf("\tSkipped next instruction: OP %04x\n", nextState.Opcode())
+		fmt.Printf(" -> Skipped next instruction: OP %04x", nextState.Opcode())
 	} else {
-		fmt.Printf("\tContinue without skip\n")
+		fmt.Printf(" -> Continued without skip")
 	}
 
 	return nextState
@@ -90,15 +90,15 @@ func (c *Chip8) skipIfVxNotEqualValue(x, value uint8) State {
 // equals the value in Vy
 func (c *Chip8) skipIfVxEqualVy(x, y uint8) State {
 	vx, vy := c.CurrState.V[x], c.CurrState.V[y]
-	fmt.Printf("Skip next instruction if V%x value (0x%x) is equal to V%x value (0x%x)\n", x, vx, y, vy)
+	fmt.Printf("Skip next instruction if V%x value (0x%x) is equal to V%x value (0x%x)", x, vx, y, vy)
 
 	nextState := c.CurrState
 
 	if vx == vy {
 		nextState.PC += 2
-		fmt.Printf("\tSkipped next instruction: OP %04x\n", nextState.Opcode())
+		fmt.Printf(" -> Skipped next instruction: OP %04x", nextState.Opcode())
 	} else {
-		fmt.Printf("\tContinue without skip\n")
+		fmt.Printf(" -> Continued without skip")
 	}
 
 	return nextState
@@ -106,7 +106,7 @@ func (c *Chip8) skipIfVxEqualVy(x, y uint8) State {
 
 // loadIntoVx: LD Vx, byte Instruction 6xkk should load the received value into Vx
 func (c *Chip8) loadIntoVx(x, value uint8) State {
-	fmt.Printf("Loading value 0x%02x into V%d\n", value, x)
+	fmt.Printf("Loading value 0x%02x into V%d", value, x)
 	nextState := c.CurrState
 	nextState.V[x] = value
 	return nextState
@@ -114,7 +114,7 @@ func (c *Chip8) loadIntoVx(x, value uint8) State {
 
 // addToVx: ADD Vx, byte Instruction 7xkk should add the received value into Vx
 func (c *Chip8) addToVx(x, value uint8) State {
-	fmt.Printf("Adding value 0x%02x to V%d\n", value, x)
+	fmt.Printf("Adding value 0x%02x to V%d", value, x)
 	nextState := c.CurrState
 	nextState.V[x] += value
 	return nextState
@@ -122,7 +122,7 @@ func (c *Chip8) addToVx(x, value uint8) State {
 
 // loadIntoVx: LD Vx, Vy Instruction 8xy0 should load the Vy value into Vx
 func (c *Chip8) loadVxIntoVy(x, y uint8) State {
-	fmt.Printf("Loading value of V%d (0x%02x) into V%d\n", y, c.CurrState.V[y], x)
+	fmt.Printf("Loading value of V%d (0x%02x) into V%d", y, c.CurrState.V[y], x)
 	nextState := c.CurrState
 	nextState.V[x] = c.CurrState.V[y]
 	return nextState
@@ -131,7 +131,7 @@ func (c *Chip8) loadVxIntoVy(x, y uint8) State {
 // loadBitwiseVxOrVyIntoVx: OR Vx, Vy Instruction 8xy1 should load the Vy BITWISE OR Vx value into Vx
 func (c *Chip8) loadBitwiseVxOrVyIntoVx(x, y uint8) State {
 	vx, vy := c.CurrState.V[x], c.CurrState.V[y]
-	fmt.Printf("Loading value of V%d (0x%02x) BITWISE OR V%d (0x%02x) into V%d\n", x, vx, y, vy, x)
+	fmt.Printf("Loading value of V%d (0x%02x) BITWISE OR V%d (0x%02x) into V%d", x, vx, y, vy, x)
 	nextState := c.CurrState
 
 	nextState.V[x] = vx | vy
@@ -141,7 +141,7 @@ func (c *Chip8) loadBitwiseVxOrVyIntoVx(x, y uint8) State {
 // loadBitwiseVxAndVyIntoVx: AND Vx, Vy Instruction 8xy2 should load the Vy BITWISE AND Vx value into Vx
 func (c *Chip8) loadBitwiseVxAndVyIntoVx(x, y uint8) State {
 	vx, vy := c.CurrState.V[x], c.CurrState.V[y]
-	fmt.Printf("Loading value of V%d (0x%02x) BITWISE AND V%d (0x%02x) into V%d\n", x, vx, y, vy, x)
+	fmt.Printf("Loading value of V%d (0x%02x) BITWISE AND V%d (0x%02x) into V%d", x, vx, y, vy, x)
 	nextState := c.CurrState
 
 	nextState.V[x] = vx & vy
@@ -151,7 +151,7 @@ func (c *Chip8) loadBitwiseVxAndVyIntoVx(x, y uint8) State {
 // loadBitwiseVxExclusiveOrVyIntoVx: XOR Vx, Vy Instruction 8xy3 should load the Vy BITWISE XOR Vx value into Vx
 func (c *Chip8) loadBitwiseVxExclusiveOrVyIntoVx(x, y uint8) State {
 	vx, vy := c.CurrState.V[x], c.CurrState.V[y]
-	fmt.Printf("Loading value of V%d (0x%02x) BITWISE XOR V%d (0x%02x) into V%d\n", x, vx, y, vy, x)
+	fmt.Printf("Loading value of V%d (0x%02x) BITWISE XOR V%d (0x%02x) into V%d", x, vx, y, vy, x)
 	nextState := c.CurrState
 
 	nextState.V[x] = vx ^ vy
@@ -162,7 +162,7 @@ func (c *Chip8) loadBitwiseVxExclusiveOrVyIntoVx(x, y uint8) State {
 // If the sum overflows (so, it's bigger than 0xFF), set VF to 1
 func (c *Chip8) addVyToVx(x, y uint8) State {
 	vx, vy := c.CurrState.V[x], c.CurrState.V[y]
-	fmt.Printf("Loading value of V%d (0x%02x) + V%d (0x%02x) into V%d\n", x, vx, y, vy, x)
+	fmt.Printf("Loading value of V%d (0x%02x) + V%d (0x%02x) into V%d", x, vx, y, vy, x)
 	nextState := c.CurrState
 
 	var sum uint16 = uint16(vx) + uint16(vy)
@@ -170,10 +170,10 @@ func (c *Chip8) addVyToVx(x, y uint8) State {
 
 	if sum > 0xFF {
 		nextState.V[0xF] = 0x01
-		fmt.Printf("\tCarry flag set to 1\n")
+		fmt.Printf("\tCarry flag set to 1")
 	} else {
 		nextState.V[0xF] = 0x00
-		fmt.Printf("\tCarry flag set to 0\n")
+		fmt.Printf("\tCarry flag set to 0")
 	}
 
 	return nextState
@@ -183,15 +183,15 @@ func (c *Chip8) addVyToVx(x, y uint8) State {
 // If the sub overflows (so, it's less than 0), set VF to 1
 func (c *Chip8) subtractVxByVy(x, y uint8) State {
 	vx, vy := c.CurrState.V[x], c.CurrState.V[y]
-	fmt.Printf("Loading value of V%d (0x%02x) - V%d (0x%02x) into V%d\n", x, vx, y, vy, x)
+	fmt.Printf("Loading value of V%d (0x%02x) - V%d (0x%02x) into V%d", x, vx, y, vy, x)
 	nextState := c.CurrState
 
 	if vx > vy {
 		nextState.V[0xF] = 0x01
-		fmt.Printf("\tNo Borrow flag set to 1\n")
+		fmt.Printf("\tNo Borrow flag set to 1")
 	} else {
 		nextState.V[0xF] = 0x00
-		fmt.Printf("\tNo Borrow flag set to 0\n")
+		fmt.Printf("\tNo Borrow flag set to 0")
 	}
 
 	nextState.V[x] = vx - vy
@@ -201,7 +201,7 @@ func (c *Chip8) subtractVxByVy(x, y uint8) State {
 
 // shiftVxRight: SHR Vx {, Vy} Instruction 8xy6 should shift right the bits on Vx and VF should be set to 1 if least significant bit is 1
 func (c *Chip8) shiftVxRight(x uint8) State {
-	fmt.Printf("Shifting right the value of V%d (0x%02x)\n", x, c.CurrState.V[x])
+	fmt.Printf("Shifting right the value of V%d (0x%02x)", x, c.CurrState.V[x])
 	nextState := c.CurrState
 
 	nextState.V[x] = c.CurrState.V[x] >> 1
@@ -213,15 +213,15 @@ func (c *Chip8) shiftVxRight(x uint8) State {
 // loadVySubtractedByVxIntoVx: SUB Vx, Vy Instruction 8xy7 should load the Vy subtracted by Vx value into Vx
 func (c *Chip8) loadVySubtractedByVxIntoVx(x, y uint8) State {
 	vx, vy := c.CurrState.V[x], c.CurrState.V[y]
-	fmt.Printf("Loading value of V%d (0x%02x) - V%d (0x%02x) into V%d\n", y, vy, x, vx, x)
+	fmt.Printf("Loading value of V%d (0x%02x) - V%d (0x%02x) into V%d", y, vy, x, vx, x)
 	nextState := c.CurrState
 
 	if vy > vx {
 		nextState.V[0xF] = 0x01
-		fmt.Printf("\tNo Borrow flag set to 1\n")
+		fmt.Printf("\tNo Borrow flag set to 1")
 	} else {
 		nextState.V[0xF] = 0x00
-		fmt.Printf("\tNo Borrow flag set to 0\n")
+		fmt.Printf("\tNo Borrow flag set to 0")
 	}
 
 	nextState.V[x] = vy - vx
@@ -231,7 +231,7 @@ func (c *Chip8) loadVySubtractedByVxIntoVx(x, y uint8) State {
 
 // shiftVxRight: SHL Vx {, Vy} Instruction 8xyE should shift left the bits on Vx and VF should be set to 1 if most significant bit is 1
 func (c *Chip8) shiftVxLeft(x uint8) State {
-	fmt.Printf("Shifting left the value of V%d (0x%02x)\n", x, c.CurrState.V[x])
+	fmt.Printf("Shifting left the value of V%d (0x%02x)", x, c.CurrState.V[x])
 	nextState := c.CurrState
 
 	nextState.V[x] = c.CurrState.V[x] << 1
@@ -244,15 +244,15 @@ func (c *Chip8) shiftVxLeft(x uint8) State {
 // is NOT equals the value in Vy
 func (c *Chip8) skipIfVxNotEqualVy(x, y uint8) State {
 	vx, vy := c.CurrState.V[x], c.CurrState.V[y]
-	fmt.Printf("Skip next instruction if V%x value (0x%x) is NOT equal to V%x value (0x%x)\n", x, vx, y, vy)
+	fmt.Printf("Skip next instruction if V%x value (0x%x) is NOT equal to V%x value (0x%x)", x, vx, y, vy)
 
 	nextState := c.CurrState
 
 	if vx != vy {
 		nextState.PC += 2
-		fmt.Printf("\tSkipped next instruction: OP %04x\n", nextState.Opcode())
+		fmt.Printf(" -> Skipped next instruction: OP %04x", nextState.Opcode())
 	} else {
-		fmt.Printf("\tContinue without skip\n")
+		fmt.Printf(" -> Continued without skip")
 	}
 
 	return nextState
@@ -260,7 +260,7 @@ func (c *Chip8) skipIfVxNotEqualVy(x, y uint8) State {
 
 // loadAddressIntoI: LD I, addr instruction Annn should load the received address into I
 func (c *Chip8) loadAddressIntoI(addr uint16) State {
-	fmt.Printf("Loading value 0x%03x into I\n", addr)
+	fmt.Printf("Loading value 0x%03x into I", addr)
 	nextState := c.CurrState
 	nextState.I = addr
 	return nextState
@@ -269,7 +269,7 @@ func (c *Chip8) loadAddressIntoI(addr uint16) State {
 // jumpToAddressPlusV0: JMP V0, addr instruction Bnnn should jump the program counter to the received address + V0
 func (c *Chip8) jumpToAddressPlusV0(addr uint16) State {
 	sum := uint16(c.CurrState.V[0x0]) + addr
-	fmt.Printf("Jump to address of V0 + %03x: 0x%03x\n", addr, sum)
+	fmt.Printf("Jump to address of V0 + %03x: 0x%03x", addr, sum)
 	nextState := c.CurrState
 	nextState.PC = sum
 	return nextState
@@ -279,7 +279,7 @@ func (c *Chip8) jumpToAddressPlusV0(addr uint16) State {
 func (c *Chip8) loadRandomValueBitwiseAndValueIntoVx(x, value uint8) State {
 	nextState := c.CurrState
 	randomValue := uint8(rand.Intn(0x100)) & value
-	fmt.Printf("Loading value 0x%02x into V%d\n", randomValue, x)
+	fmt.Printf("Loading value 0x%02x into V%d", randomValue, x)
 	nextState.V[x] = randomValue
 	return nextState
 }
@@ -287,7 +287,7 @@ func (c *Chip8) loadRandomValueBitwiseAndValueIntoVx(x, value uint8) State {
 func (c *Chip8) drawSprite(x, y, value uint8) State {
 	vx := c.CurrState.V[x]
 	vy := c.CurrState.V[y]
-	fmt.Printf("Drawing a sprite (0x%03x) on coords: %d, %d\n", c.CurrState.I, vx, vy)
+	fmt.Printf("Drawing a sprite (0x%03x) on coords: %d, %d", c.CurrState.I, vx, vy)
 	nextState := c.CurrState
 	var width uint8 = 8
 	var height uint8 = value
@@ -326,7 +326,7 @@ func (c *Chip8) skipIfVxKeyIsNotPressed(x, y uint8) State {
 }
 
 func (c *Chip8) loadDelayTimerIntoVx(x uint8) State {
-	fmt.Printf("Loading value 0x%02x into V%d\n", c.CurrState.DelayTimer, x)
+	fmt.Printf("Loading value 0x%02x into V%d", c.CurrState.DelayTimer, x)
 	nextState := c.CurrState
 	nextState.V[x] = c.CurrState.DelayTimer
 	return nextState
@@ -341,7 +341,7 @@ func (c *Chip8) waitButtonPressAndLoadIntoVx(x uint8) State {
 
 // LD Vx, DT Instruction Fx15 should load the Vx value into Delay Timer
 func (c *Chip8) loadVxIntoDelayTimer(x uint8) State {
-	fmt.Printf("Loading value V%x value (0x%02x) into Delay Timer\n", x, c.CurrState.V[x])
+	fmt.Printf("Loading value V%x value (0x%02x) into Delay Timer", x, c.CurrState.V[x])
 	nextState := c.CurrState
 	nextState.DelayTimer = nextState.V[x]
 	return nextState
@@ -349,33 +349,40 @@ func (c *Chip8) loadVxIntoDelayTimer(x uint8) State {
 
 // LD Vx, ST Instruction Fx18 should load the Vx value into Sound Timer
 func (c *Chip8) loadVxIntoSoundTimer(x uint8) State {
-	fmt.Printf("Loading value V%x value (0x%02x) into Sound Timer\n", x, c.CurrState.V[x])
+	fmt.Printf("Loading value V%x value (0x%02x) into Sound Timer", x, c.CurrState.V[x])
 	nextState := c.CurrState
 	nextState.SoundTimer = nextState.V[x]
 	return nextState
 }
 
-// addVxToI: ADD I, Vx instruction Fx1E adds the value of Vx into the existing value in I
+// addVxToI: ADD I, Vx Instruction Fx1E adds the value of Vx into the existing value in I
 func (c *Chip8) addVxToI(x uint8) State {
 	nextState := c.CurrState
-	fmt.Printf("Loading value of I (0x%03x) + V%d (0x%02x) into I\n", c.CurrState.I, x, c.CurrState.V[x])
+	fmt.Printf("Loading value of I (0x%03x) + V%d (0x%02x) into I", c.CurrState.I, x, c.CurrState.V[x])
 	nextState.I += uint16(c.CurrState.V[x])
 	return nextState
 }
 
-// loadVxDigitSpriteAddressIntoI: LD F, Vx instruction Fx29 loads the address of the Vx character sprite into I
+// loadVxDigitSpriteAddressIntoI: LD F, Vx Instruction Fx29 loads the address of the Vx character sprite into I
 func (c *Chip8) loadVxDigitSpriteAddressIntoI(x uint8) State {
 	nextState := c.CurrState
-	fmt.Printf("Loading address of the V%x character sprite (%x) into I\n", x, c.CurrState.V[x])
+	fmt.Printf("Loading address of the V%x character sprite (%x) into I", x, c.CurrState.V[x])
 	nibble := uint16(0x0F & c.CurrState.V[x])
 	nextState.I = FontsStartAddress + (5 * nibble)
 	return nextState
 }
 
+// loadVxDigitsIntoI: (LD B, Vx) Instruction Fx33 should load the Vx digits into Memory at I, I+1 and I+3
 func (c *Chip8) loadVxDigitsIntoI(x uint8) State {
 	nextState := c.CurrState
-	fmt.Printf("NOT IMPLEMENTED!!")
-	// TODO!
+	vx := c.CurrState.V[x]
+	fmt.Printf("Loading digits of the V%x (%d) into I (0x%03x), I+1 and I+2", x, vx, c.CurrState.I)
+	firstDigit := vx / 100
+	secondDigit := vx / 10 % 10
+	thirdDigit := vx % 10
+	nextState.Memory[c.CurrState.I] = firstDigit
+	nextState.Memory[c.CurrState.I+1] = secondDigit
+	nextState.Memory[c.CurrState.I+2] = thirdDigit
 	return nextState
 }
 

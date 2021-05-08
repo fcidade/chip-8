@@ -77,6 +77,7 @@ func (c *Chip8) Tick() *Chip8 {
 
 func (c *Chip8) ExecuteOpcode(opcode uint16) State {
 	fmt.Printf("OP %04x\t", opcode)
+	defer fmt.Println()
 
 	switch opcode {
 	case 0x00E0:

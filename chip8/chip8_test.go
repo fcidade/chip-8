@@ -349,6 +349,16 @@ func TestChip8(t *testing.T) {
 		assert.Equal(t, []uint8{0xF0, 0x90, 0xF0, 0x90, 0x90}, newState.Memory[newState.I:newState.I+5], "Should have loaded the right sprite")
 	})
 
+	t.Run("(LD B, Vx) Instruction Fx33 should load the Vx digits into Memory at I, I+1 and I+3", func(t *testing.T) {
+		c := New()
+		c.CurrState.V[0x1] = 237
+		c.CurrState.I = 0x210
+		newState := c.ExecuteOpcode(0xF133)
+		assert.Equal(t, uint8(2), newState.Memory[0x210], "Should have the right digit")
+		assert.Equal(t, uint8(3), newState.Memory[0x211], "Should have the right digit")
+		assert.Equal(t, uint8(7), newState.Memory[0x212], "Should have the right digit")
+	})
+
 }
 
 /*
