@@ -1,4 +1,4 @@
-package graphics
+package chip8
 
 import (
 	"fmt"
@@ -6,18 +6,17 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
+type Chip8Tick func() *Chip8
+
 type SDLGraphics struct {
-	Title         string
-	Width         int
-	Height        int
-	LogicalWidth  int
-	LogicalHeight int
+	Title  string
+	Width  int
+	Height int
 
-	running      bool
-	screenPixels []bool
-	renderer     *sdl.Renderer
+	running  bool
+	renderer *sdl.Renderer
 
-	tickFn func()
+	tickFn Chip8Tick
 }
 
 func (g *SDLGraphics) Run() error {
@@ -30,15 +29,15 @@ func (g *SDLGraphics) Run() error {
 
 		g.handleEvents()
 
-		g.tickFn()
-
-		g.Clear()
+		c8 := g.tickFn()
 
 		g.renderer.SetDrawColor(255, 255, 255, 255)
 
-		for i, active := range g.screenPixels {
-			if active {
-				g.renderer.DrawPoint(int32(i%g.LogicalWidth), int32(i/g.LogicalWidth))
+		for y, vline := range c8.CurrState.Graphics {
+			for x, painted := range vline {
+				if painted {
+					g.renderer.DrawPoint(int32(y), int32(x))
+				}
 			}
 		}
 
@@ -49,18 +48,6 @@ func (g *SDLGraphics) Run() error {
 	}
 
 	return nil
-}
-
-func (g *SDLGraphics) TogglePixel(x, y int) (isAlreadyToggled bool) {
-	index := x + (y * g.LogicalWidth)
-	isAlreadyToggled = g.screenPixels[index]
-	g.screenPixels[index] = true
-	return
-}
-
-func (g *SDLGraphics) Clear() {
-	g.renderer.SetDrawColor(0, 0, 0, 255)
-	g.renderer.Clear()
 }
 
 func (g *SDLGraphics) setup() error {
@@ -85,7 +72,7 @@ func (g *SDLGraphics) setup() error {
 		return err
 	}
 
-	renderer.SetLogicalSize(int32(g.LogicalWidth), int32(g.LogicalHeight))
+	renderer.SetLogicalSize(int32(ScreenWidth), int32(ScreenHeight))
 	g.renderer = renderer
 	return nil
 }
@@ -102,15 +89,12 @@ func (g *SDLGraphics) handleEvents() {
 	}
 }
 
-func New(tickFn func()) *SDLGraphics {
+func NewGraphicsSDL(tickFn Chip8Tick) *SDLGraphics {
 	return &SDLGraphics{
-		Title:         "Chip-8",
-		Width:         640,
-		Height:        320,
-		LogicalWidth:  64,
-		LogicalHeight: 32,
-		running:       true,
-		screenPixels:  make([]bool, 64*32),
-		tickFn:        tickFn,
+		Title:   "Chip-8",
+		Width:   640,
+		Height:  320,
+		running: true,
+		tickFn:  tickFn,
 	}
 }

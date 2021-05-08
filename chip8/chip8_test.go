@@ -4,9 +4,21 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/franciscocid/chip-8/mocks"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestGraphicsLogic(t *testing.T) {
+	s := State{}
+	for y, vline := range s.Graphics {
+		fmt.Print(y, "\t")
+		for x, painted := range vline {
+			if painted {
+			}
+			fmt.Print(x)
+		}
+		fmt.Println()
+	}
+}
 
 func TestChip8State(t *testing.T) {
 	t.Run("", func(t *testing.T) {
@@ -28,16 +40,11 @@ func TestChip8(t *testing.T) {
 
 	t.Run("(CLS) Instruction 00E0 should clear the screen", func(t *testing.T) {
 		c := New()
-		uiMock := new(mocks.Graphics)
-		uiMock.On("Clear").Return()
-		c.UI = uiMock
 
-		oldState := c.CurrState
+		c.CurrState.Graphics = [32][64]bool{{true, true}, {true}}
 		newState := c.ExecuteOpcode(0x00E0)
 
-		assert.Equal(t, oldState, newState, "State should not be altered")
-		assert.True(t, uiMock.AssertCalled(t, "Clear"), "Graphics Clear function should have been called")
-		assert.True(t, uiMock.AssertNumberOfCalls(t, "Clear", 1), "Graphics Clear function should only have been called once")
+		assert.Equal(t, newState.Graphics, [32][64]bool{}, "Graphics should be all zeroes")
 	})
 
 	t.Run("(RET) Instruction 00EE should return from a subroutine", func(t *testing.T) {

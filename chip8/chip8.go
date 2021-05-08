@@ -2,22 +2,16 @@ package chip8
 
 import "fmt"
 
-type Graphics interface {
-	Clear()
-	TogglePixel(x, y int) (isAlreadyToggled bool)
-}
-
 type Chip8 struct {
 	CurrState    State
 	StateHistory []State
-	UI           Graphics
 }
 
 const (
 	ScreenWidth         = 64
 	ScreenHeight        = 32
 	ProgramStartAddress = 0x200
-	FontsStartAddress   = 0x50
+	FontsStartAddress   = 0x050
 )
 
 const (
@@ -60,7 +54,7 @@ func (c8 *Chip8) LoadFonts() {
 	}
 }
 
-func (c *Chip8) Tick() {
+func (c *Chip8) Tick() *Chip8 {
 	fmt.Printf("PC %03x\t", c.CurrState.PC)
 	opcode := c.CurrState.Opcode()
 	c.CurrState.PC += 2
@@ -76,6 +70,7 @@ func (c *Chip8) Tick() {
 
 	c.StateHistory = append(c.StateHistory, c.CurrState)
 	c.CurrState = newState
+	return c
 }
 
 func (c *Chip8) ExecuteOpcode(opcode uint16) State {

@@ -5,13 +5,11 @@ import (
 	"os"
 
 	"github.com/franciscocid/chip-8/chip8"
-	"github.com/franciscocid/chip-8/graphics"
 )
 
 func main() {
 	c8 := chip8.New()
-	g := graphics.New(c8.Tick)
-	c8.UI = g
+	g := chip8.NewGraphicsSDL(c8.Tick)
 
 	// file, err := os.Open("roms/BLINKY.ch8")
 	// file, err := os.Open("roms/random_number_test.ch8")

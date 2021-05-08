@@ -9,6 +9,7 @@ type State struct {
 	Stack      [0xF]uint16
 	SP         uint8
 	PC         uint16
+	Graphics   [ScreenHeight][ScreenWidth]bool
 }
 
 func (s *State) Opcode() uint16 {
