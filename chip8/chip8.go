@@ -8,10 +8,10 @@ type Chip8 struct {
 }
 
 const (
-	ScreenWidth         = 64
-	ScreenHeight        = 32
-	ProgramStartAddress = 0x200
-	FontsStartAddress   = 0x050
+	ScreenWidth                = 64
+	ScreenHeight               = 32
+	ProgramStartAddress uint16 = 0x200
+	FontsStartAddress   uint16 = 0x050
 )
 
 const (
@@ -28,7 +28,7 @@ func (c *Chip8) LoadGame(gameData []uint8) {
 		PC: ProgramStartAddress,
 	}
 	for i, data := range gameData {
-		c.CurrState.Memory[ProgramStartAddress+i] = data
+		c.CurrState.Memory[int(ProgramStartAddress)+i] = data
 	}
 }
 
@@ -52,7 +52,7 @@ func (c8 *Chip8) LoadFonts() {
 		0xF0, 0x80, 0xF0, 0x80, 0x80, // F
 	}
 	for addr, value := range fonts {
-		c8.CurrState.Memory[FontsStartAddress+addr] = value
+		c8.CurrState.Memory[int(FontsStartAddress)+addr] = value
 	}
 }
 

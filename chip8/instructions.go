@@ -285,8 +285,8 @@ func (c *Chip8) loadRandomValueBitwiseAndValueIntoVx(x, value uint8) State {
 }
 
 func (c *Chip8) drawSprite(x, y, value uint8) State {
-	vx := c.CurrState.V[x] % ScreenWidth
-	vy := c.CurrState.V[y] % ScreenHeight
+	vx := c.CurrState.V[x]
+	vy := c.CurrState.V[y]
 	fmt.Printf("Drawing a sprite (0x%03x) on coords: %d, %d\n", c.CurrState.I, vx, vy)
 	nextState := c.CurrState
 	var width uint8 = 8
@@ -363,10 +363,12 @@ func (c *Chip8) addVxToI(x uint8) State {
 	return nextState
 }
 
+// loadVxDigitSpriteAddressIntoI: LD F, Vx instruction Fx29 loads the address of the Vx character sprite into I
 func (c *Chip8) loadVxDigitSpriteAddressIntoI(x uint8) State {
 	nextState := c.CurrState
-	fmt.Printf("NOT IMPLEMENTED!!")
-	// TODO!
+	fmt.Printf("Loading address of the V%x character sprite (%x) into I\n", x, c.CurrState.V[x])
+	nibble := uint16(0x0F & c.CurrState.V[x])
+	nextState.I = FontsStartAddress + (5 * nibble)
 	return nextState
 }
 

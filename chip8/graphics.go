@@ -43,7 +43,7 @@ func (g *SDLGraphics) Run() error {
 
 		g.renderer.Present()
 
-		sdl.Delay(100)
+		sdl.Delay(10)
 
 	}
 

@@ -340,14 +340,21 @@ func TestChip8(t *testing.T) {
 		assert.Equal(t, uint16(0x160), newState.I, "I should have the value of I + Vx")
 	})
 
+	t.Run("(LD F, Vx) Instruction Fx29 should load the address of the Vx character sprite into I", func(t *testing.T) {
+		c := New()
+		c.LoadFonts()
+		c.CurrState.V[0x1] = 0xA
+		newState := c.ExecuteOpcode(0xF129)
+		assert.Equal(t, uint16(0x82), newState.I, "Should be at the right address")
+		assert.Equal(t, []uint8{0xF0, 0x90, 0xF0, 0x90, 0x90}, newState.Memory[newState.I:newState.I+5], "Should have loaded the right sprite")
+	})
+
 }
 
 /*
 Todo:
 	- Delay Timer e Sound timer
 Rever os comandos:
-	- Cxkk: Dos numeros randomicos, n sei como testar, acho q setando a seed
-
 	- Fx29: usa os digitos sprite
 	- Fx33: chatinho só
 	- Fx55 e Fx65: chatos tbm
