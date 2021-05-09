@@ -20,6 +20,7 @@ func main() {
 	file, err := os.Open("roms/tetris.ch8")
 	// file, err := os.Open("roms/tictactoe.ch8")
 	// file, err := os.Open("roms/space.ch8")
+	// file, err := os.Open("roms/invaders.ch8")
 	if err != nil {
 		panic(err)
 	}

@@ -5,6 +5,7 @@ import "fmt"
 type Chip8 struct {
 	CurrState    State
 	StateHistory []State
+	TickCount    int64
 }
 
 const (
@@ -56,22 +57,25 @@ func (c8 *Chip8) LoadFonts() {
 	}
 }
 
-func (c *Chip8) Tick() {
+func (c *Chip8) Tick(deltaTime float64) {
 	fmt.Printf("PC %03x\t", c.CurrState.PC)
 	opcode := c.CurrState.Opcode()
 	c.CurrState.PC += 2
 
 	newState := c.ExecuteOpcode(opcode)
 
-	if newState.DelayTimer > 0 {
-		newState.DelayTimer--
-	}
-	if newState.SoundTimer > 0 {
-		newState.SoundTimer--
+	if c.TickCount%8 == 0 {
+		if newState.DelayTimer > 0 {
+			newState.DelayTimer--
+		}
+		if newState.SoundTimer > 0 {
+			newState.SoundTimer--
+		}
 	}
 
 	c.StateHistory = append(c.StateHistory, c.CurrState)
 	c.CurrState = newState
+	c.TickCount++
 }
 
 func (c *Chip8) PressKey(key uint8) {
@@ -185,5 +189,6 @@ func New() *Chip8 {
 	return &Chip8{
 		CurrState:    State{},
 		StateHistory: []State{},
+		TickCount:    0,
 	}
 }

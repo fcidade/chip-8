@@ -30,7 +30,7 @@ func (g *SDLGraphics) Run() error {
 		return err
 	}
 
-	const FPS = 60.0
+	const FPS = 500.0
 	const secsPerUpdate = 1 / FPS
 	var current, elapsed, lag float64
 	previous := float64(sdl.GetTicks()) * 0.001
@@ -51,7 +51,7 @@ func (g *SDLGraphics) Run() error {
 
 		// Update
 		for lag >= secsPerUpdate {
-			g.c8.Tick()
+			g.c8.Tick(secsPerUpdate)
 			lag -= secsPerUpdate
 		}
 
