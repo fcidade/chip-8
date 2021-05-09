@@ -10,6 +10,7 @@ type State struct {
 	SP         uint8
 	Stack      [0xF]uint16
 	Graphics   [ScreenHeight]uint64
+	Keyboard   [0x10]bool
 }
 
 func (s *State) Opcode() uint16 {

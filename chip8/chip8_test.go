@@ -405,10 +405,6 @@ func TestChip8(t *testing.T) {
 Todo:
 	- Delay Timer e Sound timer
 Rever os comandos:
-	- Fx29: usa os digitos sprite
-	- Fx33: chatinho só
-	- Fx55 e Fx65: chatos tbm
-
 	- Ex9E e ExA1: Mexem com tecla, n sei como vou fazer
 	- Fx0A: tecla tbm
 */

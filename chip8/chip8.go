@@ -15,10 +15,10 @@ const (
 )
 
 const (
-	NibbleSize         = 4
-	ByteSize           = NibbleSize * 2
-	FirstFontBitMask   = 0x80
-	FirstScreenBitMask = 0x1 << (ByteSize * 7)
+	NibbleSize                = 4
+	ByteSize                  = NibbleSize * 2
+	FirstFontBitMask          = 0x80
+	FirstScreenBitMask uint64 = 0x8000000000000000
 )
 
 func (c *Chip8) LoadGame(gameData []uint8) {
@@ -56,7 +56,7 @@ func (c8 *Chip8) LoadFonts() {
 	}
 }
 
-func (c *Chip8) Tick() *Chip8 {
+func (c *Chip8) Tick() {
 	fmt.Printf("PC %03x\t", c.CurrState.PC)
 	opcode := c.CurrState.Opcode()
 	c.CurrState.PC += 2
@@ -72,7 +72,18 @@ func (c *Chip8) Tick() *Chip8 {
 
 	c.StateHistory = append(c.StateHistory, c.CurrState)
 	c.CurrState = newState
-	return c
+}
+
+func (c *Chip8) IsKeyPressed(key uint8) bool {
+	return c.CurrState.Keyboard[key]
+}
+
+func (c *Chip8) PressKey(key uint8) {
+	c.CurrState.Keyboard[key] = true
+}
+
+func (c *Chip8) ReleaseKey(key uint8) {
+	c.CurrState.Keyboard[key] = false
 }
 
 func (c *Chip8) ExecuteOpcode(opcode uint16) State {
