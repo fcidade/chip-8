@@ -74,11 +74,8 @@ func (c *Chip8) Tick() {
 	c.CurrState = newState
 }
 
-func (c *Chip8) IsKeyPressed(key uint8) bool {
-	return c.CurrState.Keyboard[key]
-}
-
 func (c *Chip8) PressKey(key uint8) {
+	c.CurrState.Keyboard = [16]bool{}
 	c.CurrState.Keyboard[key] = true
 }
 
@@ -155,9 +152,9 @@ func (c *Chip8) ExecuteOpcode(opcode uint16) State {
 	case 0xE:
 		switch opcode & 0x00FF {
 		case 0x9E:
-			return c.skipIfVxKeyIsPressed(x, y)
+			return c.skipIfVxKeyIsPressed(x)
 		case 0xA1:
-			return c.skipIfVxKeyIsNotPressed(x, y)
+			return c.skipIfVxKeyIsNotPressed(x)
 		}
 	case 0xF:
 		switch opcode & 0x00FF {

@@ -1,22 +1,11 @@
 package chip8
 
 import (
-	"fmt"
 	"math/rand"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-func TestChip8State(t *testing.T) {
-	t.Run("", func(t *testing.T) {
-		t.Skip()
-		c := &State{}
-		c.Memory[0] = 0x12
-		c.Memory[1] = 0x34
-		fmt.Printf("0x%04x\n", c.Opcode())
-	})
-}
 
 func TestChip8(t *testing.T) {
 	t.Run("(SYS addr) Instructions on range 0nnn should be ignored, as they are actually SYS calls", func(t *testing.T) {
@@ -311,6 +300,30 @@ func TestChip8(t *testing.T) {
 		assert.Equal(t, uint8(0x01), newState.V[0x1], "Program Counter should have the V0 value + the received address")
 	})
 
+	t.Run("(SKP Vx Key) Instruction Ex9E should skip next instruction if Vx key is pressed", func(t *testing.T) {
+		c := New()
+		c.CurrState.PC = 0x200
+		c.CurrState.V[0x0] = 0x0A
+		c.PressKey(0xA)
+
+		newState := c.ExecuteOpcode(0xE09E)
+
+		assert.Equal(t, true, newState.Keyboard[0xA], "Key should be pressed")
+		assert.Equal(t, uint16(0x202), newState.PC, "Program Counter should increment twice")
+	})
+
+	t.Run("(SKNP Vx Key) Instruction ExA1 should skip next instruction if Vx key is NOT pressed", func(t *testing.T) {
+		c := New()
+		c.CurrState.PC = 0x200
+		c.CurrState.V[0x0] = 0x0A
+		c.ReleaseKey(0xA)
+
+		newState := c.ExecuteOpcode(0xE0A1)
+
+		assert.Equal(t, false, newState.Keyboard[0xA], "Key should be released")
+		assert.Equal(t, uint16(0x202), newState.PC, "Program Counter should increment twice")
+	})
+
 	t.Run("(LD Vx, DT) Instruction Fx07 should load the Delay Timer into Vx", func(t *testing.T) {
 		c := New()
 		c.CurrState.DelayTimer = 0x34
@@ -318,7 +331,23 @@ func TestChip8(t *testing.T) {
 		assert.Equal(t, uint8(0x34), newState.V[0x0], "Vx should have the value of the Delay Timer")
 	})
 
-	t.Run("(LD Vx, DT) Instruction Fx15 should load the Vx value into Delay Timer", func(t *testing.T) {
+	t.Run("(LD Vx, Key) Instruction Fx0A should wait until a key is pressed and then load the key into Vx", func(t *testing.T) {
+		c := New()
+		c.CurrState.PC = 0x200
+
+		newState := c.ExecuteOpcode(0xF00A)
+
+		assert.Equal(t, uint8(0x00), newState.V[0x0], "Vx should have be zero")
+		assert.Equal(t, uint16(0x1FE), newState.PC, "PC should repeat")
+
+		c.PressKey(0x0B)
+		newState = c.ExecuteOpcode(0xF00A)
+
+		assert.Equal(t, uint8(0x0B), newState.V[0x0], "Vx should have the key value")
+		assert.Equal(t, uint16(0x200), newState.PC, "PC should continue")
+	})
+
+	t.Run("(LD DT, Vx) Instruction Fx15 should load the Vx value into Delay Timer", func(t *testing.T) {
 		c := New()
 		c.CurrState.V[0x1] = 0x34
 		newState := c.ExecuteOpcode(0xF115)
@@ -404,7 +433,4 @@ func TestChip8(t *testing.T) {
 /*
 Todo:
 	- Delay Timer e Sound timer
-Rever os comandos:
-	- Ex9E e ExA1: Mexem com tecla, n sei como vou fazer
-	- Fx0A: tecla tbm
 */
