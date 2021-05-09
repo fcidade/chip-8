@@ -30,12 +30,32 @@ func (g *SDLGraphics) Run() error {
 		return err
 	}
 
-	for g.running {
+	const FPS = 60.0
+	const secsPerUpdate = 1 / FPS
+	var current, elapsed, lag float64
+	previous := float64(sdl.GetTicks()) * 0.001
 
+	for g.running {
+		current = float64(sdl.GetTicks()) * 0.001
+		elapsed = current - previous
+		previous = current
+
+		if elapsed > 1.0 {
+			continue
+		}
+
+		lag += elapsed
+
+		// Input/Events
 		g.handleEvents()
 
-		g.c8.Tick()
+		// Update
+		for lag >= secsPerUpdate {
+			g.c8.Tick()
+			lag -= secsPerUpdate
+		}
 
+		// Draw
 		g.renderer.SetDrawColor(0, 0, 0, 0)
 		g.renderer.Clear()
 
@@ -50,9 +70,6 @@ func (g *SDLGraphics) Run() error {
 		}
 
 		g.renderer.Present()
-
-		// sdl.Delay(100)
-
 	}
 
 	return nil

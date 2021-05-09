@@ -299,12 +299,10 @@ func (c *Chip8) drawSprite(x, y, value uint8) State {
 		sprite := c.CurrState.Memory[spriteRow]
 
 		for col := uint8(0); col < width; col++ {
-			isAlreadyPainted := c.CurrState.GetPixel(x, y)
-			if isAlreadyPainted {
-				nextState.V[0xF] = 0x01
-			}
 			if sprite&(FirstFontBitMask>>col) != 0 {
-				nextState.SetPixel(vx+col, vy+row)
+				if isAlreadyPainted := nextState.SetPixel(vx+col, vy+row); isAlreadyPainted {
+					nextState.V[0xF] = 0x01
+				}
 			}
 		}
 	}
