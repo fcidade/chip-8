@@ -429,8 +429,3 @@ func TestChip8(t *testing.T) {
 	})
 
 }
-
-/*
-Todo:
-	- Delay Timer e Sound timer
-*/

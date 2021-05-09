@@ -24,9 +24,10 @@ func (s *State) GetPixel(x, y uint8) bool {
 }
 
 func (s *State) SetPixel(x, y uint8) {
-	clampedX := uint64(FirstScreenBitMask) >> (x % ScreenWidth)
+	xBitShifting := (x % ScreenWidth)
+	clampedX := uint64(FirstScreenBitMask) >> xBitShifting
 	clampedY := y % ScreenHeight
-	isAlreadyPainted := s.GetPixel(x, y)
+	isAlreadyPainted := s.GetPixel(xBitShifting, clampedY)
 	if isAlreadyPainted {
 		s.Graphics[clampedY] &= ^uint64(clampedX)
 	} else {
